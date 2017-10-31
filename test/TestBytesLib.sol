@@ -20,25 +20,6 @@ contract TestBytesLib {
     event LogBytes(bytes loggedBytes);
 
     /**
-    * Constructor
-    */
-
-    // function Tester() public {
-    //     // The following storage variables have as suffixes their actual length
-    //     // They are more densely distributed around every multiple of 32
-    //     // because it's at a 32-bytes-length that storage tightly packed
-    //     // arrays have different layouts
-    //     storageBytes.push(hex"f00dfeed"); //4 bytes
-    //     storageBytes.push(hex"f00d000000000000000000000000000000000000000000000000000000feed"); //31 bytes
-    //     storageBytes.push(hex"f00d00000000000000000000000000000000000000000000000000000000feed"); //32 bytes
-    //     storageBytes.push(hex"f00d0000000000000000000000000000000000000000000000000000000000feed"); //33 bytes
-    //     storageBytes.push(hex"f00d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000feed"); //63 bytes
-    //     storageBytes.push(hex"f00d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000feed"); //64 bytes
-    //     storageBytes.push(hex"f00d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000feed"); //65 bytes
-    //     storageBytes.push(hex"f00d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000feed"); //70 bytes
-    // }
-
-    /**
     * Helper Functions
     */
 
