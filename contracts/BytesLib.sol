@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity 0.4.19;
 
 
 library BytesLib {
@@ -198,42 +198,51 @@ library BytesLib {
         return tempUint;
     }
 
-    function equal(bytes memory _preBytes, bytes memory _postBytes) internal view returns (bool) {
-        bool success = false;
+    function equal(bytes memory _preBytes, bytes memory _postBytes) internal pure returns (bool) {
+        bool success = true;
 
         assembly {
             let length := mload(_preBytes)
 
             // if lengths don't match the arrays are not equal
-            jumpi(unsuccess, iszero(eq(length, mload(_postBytes))))
-            
-            let mc := add(_preBytes, 0x20)
-            let end := add(mc, length)
+            switch eq(length, mload(_postBytes))
+            case 1 {
+                // cb is a circuit breaker in the for loop since there's 
+                //  no said feature for inline assembly loops
+                // cb = 1 - don't breaker
+                // cb = 0 - break
+                let cb := 1
 
-            for {
-                let cc := add(_postBytes, 0x20)
-            } lt(mc, end) {
-                mc := add(mc, 0x20)
-                cc := add(cc, 0x20)
-            } {
-                // if any of these checks fails then arrays are not equal
-                jumpi(unsuccess, iszero(eq(mload(mc), mload(cc))))
+                let mc := add(_preBytes, 0x20)
+                let end := add(mc, length)
+
+                for {
+                    let cc := add(_postBytes, 0x20)
+                // the next line is the loop condition:
+                // while(uint(mc < end) + cb == 2)
+                } eq(add(lt(mc, end), cb), 2) {
+                    mc := add(mc, 0x20)
+                    cc := add(cc, 0x20)
+                } {
+                    // if any of these checks fails then arrays are not equal
+                    if iszero(eq(mload(mc), mload(cc))) {
+                        // unsuccess:
+                        success := 0
+                        cb := 0
+                    }
+                }
             }
-
-            // success: all conditions check out, we'll jump over unsuccess :D
-            success := 1
-        unsuccess:
-            // Now we have to compensate for the stack unbalance here because the stack
-            //  height analyser goes top-down opcode by opcode and not by control flow
-            //  v. http://solidity.readthedocs.io/en/develop/assembly.html#labels
-            42 // The meaning of life
+            default {
+                // unsuccess:
+                success := 0
+            }
         }
 
         return success;
     }
 
     function equalStorage(bytes storage _preBytes, bytes memory _postBytes) internal view returns (bool) {
-        bool success = false;
+        bool success = true;
 
         assembly {
             // we know _preBytes_offset is 0
@@ -242,41 +251,53 @@ library BytesLib {
             let mlength := mload(_postBytes)
 
             // if lengths don't match the arrays are not equal
-            jumpi(unsuccess, iszero(eq(slength, mlength)))
-
-            // slength can contain both the length and contents of the array
-            // if length < 32 bytes so let's prepare for that
-            // v. http://solidity.readthedocs.io/en/latest/miscellaneous.html#layout-of-state-variables-in-storage
-            switch lt(slength, 32)
+            switch eq(slength, mlength)
             case 1 {
-                // blank the last byte which is the length
-                fslot := mul(div(fslot, 0x100), 0x100)
+                // slength can contain both the length and contents of the array
+                // if length < 32 bytes so let's prepare for that
+                // v. http://solidity.readthedocs.io/en/latest/miscellaneous.html#layout-of-state-variables-in-storage
+                switch lt(slength, 32)
+                case 1 {
+                    // blank the last byte which is the length
+                    fslot := mul(div(fslot, 0x100), 0x100)
 
-                jumpi(unsuccess, iszero(eq(fslot, mload(add(_postBytes, 0x20)))))
-            }
-            default {
-                // get the keccak hash to get the contents of the array
-                mstore(0x0, _preBytes_slot)
-                let sc := keccak256(0x0, 0x20)
-                
-                let mc := add(_postBytes, 0x20)
-                let end := add(mc, mlength)
-                
-                for {} lt(mc, end) {
-                    sc := add(sc, 1)
-                    mc := add(mc, 0x20)
-                } {
-                    jumpi(unsuccess, iszero(eq(sload(sc), mload(mc))))
+                    if iszero(eq(fslot, mload(add(_postBytes, 0x20)))) {
+                        // unsuccess:
+                        success := 0
+                    }
+                }
+                default {
+                    // cb is a circuit breaker in the for loop since there's 
+                    //  no said feature for inline assembly loops
+                    // cb = 1 - don't breaker
+                    // cb = 0 - break
+                    let cb := 1
+                    
+                    // get the keccak hash to get the contents of the array
+                    mstore(0x0, _preBytes_slot)
+                    let sc := keccak256(0x0, 0x20)
+                    
+                    let mc := add(_postBytes, 0x20)
+                    let end := add(mc, mlength)
+
+                    // the next line is the loop condition:
+                    // while(uint(mc < end) + cb == 2)
+                    for {} eq(add(lt(mc, end), cb), 2) {
+                        sc := add(sc, 1)
+                        mc := add(mc, 0x20)
+                    } {
+                        if iszero(eq(sload(sc), mload(mc))) {
+                            // unsuccess:
+                            success := 0
+                            cb := 0
+                        }
+                    }
                 }
             }
-
-            // success: all conditions check out, we'll jump over unsuccess :D
-            success := 1
-        unsuccess:
-            // Now we have to compensate for the stack unbalance here because the stack
-            //  height analyser goes top-down opcode by opcode and not by control flow
-            //  v. http://solidity.readthedocs.io/en/develop/assembly.html#labels
-            42 // The meaning of life
+            default {
+                // unsuccess:
+                success := 0
+            }
         }
 
         return success;
