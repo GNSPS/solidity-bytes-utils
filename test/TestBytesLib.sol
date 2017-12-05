@@ -1,12 +1,15 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.17;
 
 import "truffle/Assert.sol";
-import "truffle/DeployedAddresses.sol";
+import "../contracts/AssertBytes.sol";
 import "../contracts/BytesLib.sol";
+
 
 contract TestBytesLib {
 
     using BytesLib for bytes;
+
+    bytes storageCheckBytes = hex"aabbccddeeff";
 
     bytes storageBytes4 = hex"f00dfeed";
     bytes storageBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
@@ -18,6 +21,422 @@ contract TestBytesLib {
     bytes storageBytes70 = hex"f00d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000feed";
 
     event LogBytes(bytes loggedBytes);
+
+    /**
+    * Sanity Checks
+    */
+
+    function testSanityCheck() public {
+        // Assert library sanity checks
+        bytes memory checkBytes = hex"aabbccddeeff";
+
+        bytes memory checkBytesRight = hex"aabbccddeeff";
+        bytes memory checkBytesWrong = hex"000000";
+
+        AssertBytes.equal(checkBytes, checkBytesRight, "Sanity check should be checking equal strings out!!!");
+        AssertBytes.notEqual(checkBytes, checkBytesWrong, "Sanity check should be checking different strings out!!!");
+
+        AssertBytes.equalStorage(storageCheckBytes, checkBytesRight, "Sanity check should be checking equal strings out!!!");
+        AssertBytes.notEqualStorage(storageCheckBytes, checkBytesWrong, "Sanity check should be checking different strings out!!!");
+    }
+
+    /**
+    * Memory Integrity Checks
+    */
+
+    function testMemoryIntegrityCheck4Bytes() public {
+        bytes memory preBytes4 = hex"f00dfeed";
+        bytes memory postBytes4 = hex"f00dfeed";
+        bytes memory postBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+        bytes memory postBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+        bytes memory postBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        resultBytes = preBytes4.concat(postBytes4);
+        
+        // Now we should make sure that all the other previously initialized arrays stayed the same
+        testBytes = hex"f00dfeed";
+        AssertBytes.equal(preBytes4, testBytes, "After a postBytes4 concat the preBytes4 integrity check failed.");
+        AssertBytes.equal(postBytes4, testBytes, "After a postBytes4 concat the postBytes4 integrity check failed.");
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(postBytes31, testBytes, "After a postBytes4 concat the postBytes31 integrity check failed.");
+        testBytes = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(postBytes32, testBytes, "After a postBytes4 concat the postBytes32 integrity check failed.");
+        testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(postBytes33, testBytes, "After a postBytes4 concat the postBytes33 integrity check failed.");
+    }
+
+    function testMemoryIntegrityCheck31Bytes() public {
+        bytes memory preBytes4 = hex"f00dfeed";
+        bytes memory postBytes4 = hex"f00dfeed";
+        bytes memory postBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+        bytes memory postBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+        bytes memory postBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        resultBytes = preBytes4.concat(postBytes31);
+
+        // Now we should make sure that all the other previously initialized arrays stayed the same
+        testBytes = hex"f00dfeed";
+        AssertBytes.equal(preBytes4, testBytes, "After a postBytes31 concat the preBytes4 integrity check failed.");
+        AssertBytes.equal(postBytes4, testBytes, "After a postBytes31 concat the postBytes4 integrity check failed.");
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(postBytes31, testBytes, "After a postBytes31 concat the postBytes31 integrity check failed.");
+        testBytes = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(postBytes32, testBytes, "After a postBytes31 concat the postBytes32 integrity check failed.");
+        testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(postBytes33, testBytes, "After a postBytes31 concat the postBytes33 integrity check failed.");
+    }
+
+    function testMemoryIntegrityCheck32Bytes() public {
+        bytes memory preBytes4 = hex"f00dfeed";
+        bytes memory postBytes4 = hex"f00dfeed";
+        bytes memory postBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+        bytes memory postBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+        bytes memory postBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        resultBytes = preBytes4.concat(postBytes32);
+
+        // Now we should make sure that all the other previously initialized arrays stayed the same
+        testBytes = hex"f00dfeed";
+        AssertBytes.equal(preBytes4, testBytes, "After a postBytes32 concat the preBytes4 integrity check failed.");
+        AssertBytes.equal(postBytes4, testBytes, "After a postBytes32 concat the postBytes4 integrity check failed.");
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(postBytes31, testBytes, "After a postBytes32 concat the postBytes31 integrity check failed.");
+        testBytes = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(postBytes32, testBytes, "After a postBytes32 concat the postBytes32 integrity check failed.");
+        testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(postBytes33, testBytes, "After a postBytes32 concat the postBytes33 integrity check failed.");
+    }
+
+    function testMemoryIntegrityCheck33Bytes() public {
+        bytes memory preBytes4 = hex"f00dfeed";
+        bytes memory postBytes4 = hex"f00dfeed";
+        bytes memory postBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+        bytes memory postBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+        bytes memory postBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        resultBytes = preBytes4.concat(postBytes33);
+
+        // Now we should make sure that all the other previously initialized arrays stayed the same
+        testBytes = hex"f00dfeed";
+        AssertBytes.equal(preBytes4, testBytes, "After a postBytes33 concat the preBytes4 integrity check failed.");
+        AssertBytes.equal(postBytes4, testBytes, "After a postBytes33 concat the postBytes4 integrity check failed.");
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(postBytes31, testBytes, "After a postBytes33 concat the postBytes31 integrity check failed.");
+        testBytes = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(postBytes32, testBytes, "After a postBytes33 concat the postBytes32 integrity check failed.");
+        testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(postBytes33, testBytes, "After a postBytes33 concat the postBytes33 integrity check failed.");
+
+    }
+
+    /**
+    * Memory Concatenation Tests
+    */
+
+    function testConcatMemory4Bytes() public {
+        // Initialize `bytes` variables in memory with different critical sizes
+        bytes memory preBytes4 = hex"f00dfeed";
+        bytes memory preBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+        bytes memory preBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+        bytes memory preBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory postBytes4 = hex"f00dfeed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        /*
+        * START 4-sized bytes tests
+        */
+
+        resultBytes = preBytes4.concat(postBytes4);
+        testBytes = hex"f00dfeedf00dfeed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes4 + postBytes4 concatenation failed.");
+
+        resultBytes = preBytes31.concat(postBytes4);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes31 + postBytes4 concatenation failed.");
+
+        resultBytes = preBytes32.concat(postBytes4);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes32 + postBytes4 concatenation failed.");
+
+        resultBytes = preBytes33.concat(postBytes4);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes33 + postBytes4 concatenation failed.");
+    }
+
+    function testConcatMemory31Bytes() public {
+        // Initialize `bytes` variables in memory with different critical sizes
+        bytes memory preBytes4 = hex"f00dfeed";
+        bytes memory preBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+        bytes memory preBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+        bytes memory preBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+        
+        bytes memory postBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        resultBytes = preBytes4.concat(postBytes31);
+        testBytes = hex"f00dfeedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes4 + postBytes31 concatenation failed.");
+
+        resultBytes = preBytes31.concat(postBytes31);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes31 + postBytes31 concatenation failed.");
+
+        resultBytes = preBytes32.concat(postBytes31);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes32 + postBytes31 concatenation failed.");
+
+        resultBytes = preBytes33.concat(postBytes31);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes33 + postBytes31 concatenation failed.");
+    }
+
+    function testConcatMemory32Bytes() public {
+        // Initialize `bytes` variables in memory with different critical sizes
+        bytes memory preBytes4 = hex"f00dfeed";
+        bytes memory preBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+        bytes memory preBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+        bytes memory preBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory postBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        resultBytes = preBytes4.concat(postBytes32);
+        testBytes = hex"f00dfeedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes4 + postBytes32 concatenation failed.");
+
+        resultBytes = preBytes31.concat(postBytes32);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes31 + postBytes32 concatenation failed.");
+
+        resultBytes = preBytes32.concat(postBytes32);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes32 + postBytes32 concatenation failed.");
+
+        resultBytes = preBytes33.concat(postBytes32);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes33 + postBytes32 concatenation failed.");
+    }
+
+    function testConcatMemory33Bytes() public {
+        // Initialize `bytes` variables in memory with different critical sizes
+        bytes memory preBytes4 = hex"f00dfeed";
+        bytes memory preBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+        bytes memory preBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+        bytes memory preBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+        // And another set of the same to concatenate with
+        bytes memory postBytes4 = hex"f00dfeed";
+        bytes memory postBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+        bytes memory postBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+        bytes memory postBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        resultBytes = preBytes4.concat(postBytes33);
+        testBytes = hex"f00dfeedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes4 + postBytes33 concatenation failed.");
+
+        resultBytes = preBytes31.concat(postBytes33);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes31 + postBytes33 concatenation failed.");
+
+        resultBytes = preBytes32.concat(postBytes33);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes32 + postBytes33 concatenation failed.");
+
+        resultBytes = preBytes33.concat(postBytes33);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equal(resultBytes, testBytes, "preBytes33 + postBytes33 concatenation failed.");
+
+    }
+
+    /**
+    * Storage Concatenation Tests
+    */
+
+    function testConcatStorage4Bytes() public {
+        // Initialize `bytes` variables in memory
+        bytes memory memBytes4 = hex"f00dfeed";
+
+        bytes memory testBytes;
+
+        storageBytes4.concatStorage(memBytes4);
+        testBytes = hex"f00dfeedf00dfeed";
+        AssertBytes.equalStorage(storageBytes4, testBytes, "storageBytes4 + memBytes4 concatenation failed.");
+
+        storageBytes31.concatStorage(memBytes4);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed";
+        AssertBytes.equalStorage(storageBytes31, testBytes, "storageBytes31 + memBytes4 concatenation failed.");
+
+        storageBytes32.concatStorage(memBytes4);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed";
+        AssertBytes.equalStorage(storageBytes32, testBytes, "storageBytes32 + memBytes4 concatenation failed.");
+
+        storageBytes33.concatStorage(memBytes4);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed";
+        AssertBytes.equalStorage(storageBytes33, testBytes, "storageBytes33 + memBytes4 concatenation failed.");
+
+        storageBytes63.concatStorage(memBytes4);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed";
+        AssertBytes.equalStorage(storageBytes63, testBytes, "storageBytes63 + memBytes4 concatenation failed.");
+
+        storageBytes64.concatStorage(memBytes4);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed";
+        AssertBytes.equalStorage(storageBytes64, testBytes, "storageBytes64 + memBytes4 concatenation failed.");
+
+        storageBytes65.concatStorage(memBytes4);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed";
+        AssertBytes.equalStorage(storageBytes65, testBytes, "storageBytes65 + memBytes4 concatenation failed.");
+
+        storageBytes70.concatStorage(memBytes4);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed";
+        AssertBytes.equalStorage(storageBytes70, testBytes, "storageBytes70 + memBytes4 concatenation failed.");
+
+        resetStorage();
+    }
+
+    function testConcatStorage31Bytes() public {
+        // Initialize `bytes` variables in memory
+        bytes memory memBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+
+        storageBytes4.concatStorage(memBytes31);
+        testBytes = hex"f00dfeedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes4, testBytes, "storageBytes4 + memBytes31 concatenation failed.");
+
+        storageBytes31.concatStorage(memBytes31);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes31, testBytes, "storageBytes31 + memBytes31 concatenation failed.");
+
+        storageBytes32.concatStorage(memBytes31);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes32, testBytes, "storageBytes32 + memBytes31 concatenation failed.");
+
+        storageBytes33.concatStorage(memBytes31);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes33, testBytes, "storageBytes33 + memBytes31 concatenation failed.");
+
+        storageBytes63.concatStorage(memBytes31);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes63, testBytes, "storageBytes63 + memBytes31 concatenation failed.");
+
+        storageBytes64.concatStorage(memBytes31);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes64, testBytes, "storageBytes64 + memBytes31 concatenation failed.");
+
+        storageBytes65.concatStorage(memBytes31);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes65, testBytes, "storageBytes65 + memBytes31 concatenation failed.");
+
+        storageBytes70.concatStorage(memBytes31);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes70, testBytes, "storageBytes70 + memBytes31 concatenation failed.");
+
+        resetStorage();
+    }
+
+    function testConcatStorage32Bytes() public {
+        // Initialize `bytes` variables in memory
+        bytes memory memBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+
+        storageBytes4.concatStorage(memBytes32);
+        testBytes = hex"f00dfeedf00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes4, testBytes, "storageBytes4 + memBytes32 concatenation failed.");
+
+        storageBytes31.concatStorage(memBytes32);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes31, testBytes, "storageBytes31 + memBytes32 concatenation failed.");
+
+        storageBytes32.concatStorage(memBytes32);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes32, testBytes, "storageBytes32 + memBytes32 concatenation failed.");
+
+        storageBytes33.concatStorage(memBytes32);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes33, testBytes, "storageBytes33 + memBytes32 concatenation failed.");
+
+        storageBytes63.concatStorage(memBytes32);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes63, testBytes, "storageBytes63 + memBytes32 concatenation failed.");
+
+        storageBytes64.concatStorage(memBytes32);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes64, testBytes, "storageBytes64 + memBytes32 concatenation failed.");
+
+        storageBytes65.concatStorage(memBytes32);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes65, testBytes, "storageBytes65 + memBytes32 concatenation failed.");
+
+        storageBytes70.concatStorage(memBytes32);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes70, testBytes, "storageBytes70 + memBytes32 concatenation failed.");
+
+        resetStorage();
+    }
+
+    function testConcatStorage33Bytes() public {
+        // Initialize `bytes` variables in memory
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+
+        storageBytes4.concatStorage(memBytes33);
+        testBytes = hex"f00dfeedf00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes4, testBytes, "storageBytes4 + memBytes33 concatenation failed.");
+
+        storageBytes31.concatStorage(memBytes33);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes31, testBytes, "storageBytes31 + memBytes33 concatenation failed.");
+
+        storageBytes32.concatStorage(memBytes33);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes32, testBytes, "storageBytes32 + memBytes33 concatenation failed.");
+
+        storageBytes33.concatStorage(memBytes33);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes33, testBytes, "storageBytes33 + memBytes33 concatenation failed.");
+
+        storageBytes63.concatStorage(memBytes33);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes63, testBytes, "storageBytes63 + memBytes33 concatenation failed.");
+
+        storageBytes64.concatStorage(memBytes33);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes64, testBytes, "storageBytes64 + memBytes33 concatenation failed.");
+
+        storageBytes65.concatStorage(memBytes33);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes65, testBytes, "storageBytes65 + memBytes33 concatenation failed.");
+
+        storageBytes70.concatStorage(memBytes33);
+        testBytes = hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed";
+        AssertBytes.equalStorage(storageBytes70, testBytes, "storageBytes70 + memBytes33 concatenation failed.");
+
+        resetStorage();
+
+    }
 
     /**
     * Helper Functions
@@ -32,124 +451,6 @@ contract TestBytesLib {
         storageBytes64 = hex"f00d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000feed";
         storageBytes65 = hex"f00d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000feed";
         storageBytes70 = hex"f00d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000feed";
-    }
-
-    /**
-    * Storage Concatenation Tests
-    */
-
-    function testSanityCheckAssertLib() public {
-        // Assert library sanity checks
-        bytes memory checkBytes = hex"aabbccddeeff";
-        bytes memory checkBytesRight = hex"aabbccddeeff";
-        bytes memory checkBytesWrong = hex"000000";
-        Assert.equal(string(checkBytes), string(checkBytesRight), "Sanity check should be checking equal strings out!!!");
-        Assert.equal(string(checkBytes), string(checkBytesWrong), "Sanity check should be checking different strings out!!!");
-    }
-
-    function testConcatStorage() public {
-        // Initialize `bytes` variables in memory with different sizes as well
-        bytes memory memBytes4 = hex"f00dfeed";
-        bytes memory memBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
-        bytes memory memBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
-        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
-
-        bytes memory concatBytesCurrent;
-
-        //storageBytes4 tests
-        concatBytesCurrent = storageBytes4.concatStorage(memBytes4);
-        Assert.equal(concatBytesCurrent, string(hex"f00dfeedf00dfeed"), "storageBytes4 + memBytes4 concatenation failed.");
-        concatBytesCurrent = storageBytes4.concatStorage(memBytes31);
-        Assert.equal(concatBytesCurrent, string(hex"f00dfeedf00d000000000000000000000000000000000000000000000000000000feed"), "storageBytes4 + memBytes31 concatenation failed.");
-        concatBytesCurrent = storageBytes4.concatStorage(memBytes32);
-        Assert.equal(concatBytesCurrent, string(hex"f00dfeedf00d00000000000000000000000000000000000000000000000000000000feed"), "storageBytes4 + memBytes32 concatenation failed.");
-        concatBytesCurrent = storageBytes4.concatStorage(memBytes33);
-        Assert.equal(concatBytesCurrent, string(hex"f00dfeedf00d0000000000000000000000000000000000000000000000000000000000feed"), "storageBytes4 + memBytes33 concatenation failed.");
-
-        resetStorage();
-
-        //storageBytes31 tests
-        concatBytesCurrent = storageBytes31.concatStorage(memBytes4);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed"), "storageBytes31 + memBytes4 concatenation failed.");
-        concatBytesCurrent = storageBytes31.concatStorage(memBytes31);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed"), "storageBytes31 + memBytes31 concatenation failed.");
-        concatBytesCurrent = storageBytes31.concatStorage(memBytes32);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed"), "storageBytes31 + memBytes32 concatenation failed.");
-        concatBytesCurrent = storageBytes31.concatStorage(memBytes33);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed"), "storageBytes31 + memBytes33 concatenation failed.");
-
-        resetStorage();
-
-        //storageBytes32 tests
-        concatBytesCurrent = storageBytes32.concatStorage(memBytes4);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed"), "storageBytes32 + memBytes4 concatenation failed.");
-        concatBytesCurrent = storageBytes32.concatStorage(memBytes31);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed"), "storageBytes32 + memBytes31 concatenation failed.");
-        concatBytesCurrent = storageBytes32.concatStorage(memBytes32);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed"), "storageBytes32 + memBytes32 concatenation failed.");
-        concatBytesCurrent = storageBytes32.concatStorage(memBytes33);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed"), "storageBytes32 + memBytes33 concatenation failed.");
-
-        resetStorage();
-
-        //storageBytes33 tests
-        concatBytesCurrent = storageBytes33.concatStorage(memBytes4);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed"), "storageBytes33 + memBytes4 concatenation failed.");
-        concatBytesCurrent = storageBytes33.concatStorage(memBytes31);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed"), "storageBytes33 + memBytes31 concatenation failed.");
-        concatBytesCurrent = storageBytes33.concatStorage(memBytes32);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed"), "storageBytes33 + memBytes32 concatenation failed.");
-        concatBytesCurrent = storageBytes33.concatStorage(memBytes33);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed"), "storageBytes33 + memBytes33 concatenation failed.");
-
-        resetStorage();
-
-        //storageBytes63 tests
-        concatBytesCurrent = storageBytes63.concatStorage(memBytes4);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed"), "storageBytes63 + memBytes4 concatenation failed.");
-        concatBytesCurrent = storageBytes63.concatStorage(memBytes31);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed"), "storageBytes63 + memBytes31 concatenation failed.");
-        concatBytesCurrent = storageBytes63.concatStorage(memBytes32);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed"), "storageBytes63 + memBytes32 concatenation failed.");
-        concatBytesCurrent = storageBytes63.concatStorage(memBytes33);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed"), "storageBytes63 + memBytes33 concatenation failed.");
-
-        resetStorage();
-
-        //storageBytes64 tests
-        concatBytesCurrent = storageBytes64.concatStorage(memBytes4);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed"), "storageBytes64 + memBytes4 concatenation failed.");
-        concatBytesCurrent = storageBytes64.concatStorage(memBytes31);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed"), "storageBytes64 + memBytes31 concatenation failed.");
-        concatBytesCurrent = storageBytes64.concatStorage(memBytes32);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed"), "storageBytes64 + memBytes32 concatenation failed.");
-        concatBytesCurrent = storageBytes64.concatStorage(memBytes33);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed"), "storageBytes64 + memBytes33 concatenation failed.");
-
-        resetStorage();
-
-        //storageBytes65 tests
-        concatBytesCurrent = storageBytes65.concatStorage(memBytes4);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed"), "storageBytes65 + memBytes4 concatenation failed.");
-        concatBytesCurrent = storageBytes65.concatStorage(memBytes31);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed"), "storageBytes65 + memBytes31 concatenation failed.");
-        concatBytesCurrent = storageBytes65.concatStorage(memBytes32);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed"), "storageBytes65 + memBytes32 concatenation failed.");
-        concatBytesCurrent = storageBytes65.concatStorage(memBytes33);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed"), "storageBytes65 + memBytes33 concatenation failed.");
-
-        resetStorage();
-
-        //storageBytes70 tests
-        concatBytesCurrent = storageBytes70.concatStorage(memBytes4);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00dfeed"), "storageBytes70 + memBytes4 concatenation failed.");
-        concatBytesCurrent = storageBytes70.concatStorage(memBytes31);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d000000000000000000000000000000000000000000000000000000feed"), "storageBytes70 + memBytes31 concatenation failed.");
-        concatBytesCurrent = storageBytes70.concatStorage(memBytes32);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed"), "storageBytes70 + memBytes32 concatenation failed.");
-        concatBytesCurrent = storageBytes70.concatStorage(memBytes33);
-        Assert.equal(concatBytesCurrent, string(hex"f00d000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed"), "storageBytes70 + memBytes33 concatenation failed.");
-
     }
 
 }
