@@ -1,8 +1,8 @@
-pragma solidity ^0.4.15;
+pragma solidity 0.4.18;
 
 
 library BytesLib {
-    function concat(bytes _preBytes, bytes _postBytes) internal pure returns (bytes) {
+    function concat(bytes memory _preBytes, bytes memory _postBytes) internal pure returns (bytes) {
         bytes memory tempBytes;
         
         assembly {
@@ -44,7 +44,7 @@ library BytesLib {
         return tempBytes;
     }
     
-    function concatStorage(bytes storage _preBytes, bytes _postBytes) internal {
+    function concatStorage(bytes storage _preBytes, bytes memory _postBytes) internal {
         assembly {
             // we know _preBytes_offset is 0
             let fslot := sload(_preBytes_slot)
@@ -73,8 +73,8 @@ library BytesLib {
                                     // zero all bytes to the right
                                     exp(0x100, sub(32, mlength))
                                 ),
-                                // and now shift left one byte to leave
-                                // space for the length in the slot
+                                // and now shift left the number of bytes to
+                                // leave space for the length in the slot
                                 exp(0x100, sub(32, newlength))
                             ),
                             // increase length by the double of the memory
@@ -196,5 +196,89 @@ library BytesLib {
         }
         
         return tempUint;
+    }
+
+    function equal(bytes memory _preBytes, bytes memory _postBytes) internal view returns (bool) {
+        bool success = false;
+
+        assembly {
+            let length := mload(_preBytes)
+
+            // if lengths don't match the arrays are not equal
+            jumpi(unsuccess, iszero(eq(length, mload(_postBytes))))
+            
+            let mc := add(_preBytes, 0x20)
+            let end := add(mc, length)
+
+            for {
+                let cc := add(_postBytes, 0x20)
+            } lt(mc, end) {
+                mc := add(mc, 0x20)
+                cc := add(cc, 0x20)
+            } {
+                // if any of these checks fails then arrays are not equal
+                jumpi(unsuccess, iszero(eq(mload(mc), mload(cc))))
+            }
+
+            // success: all conditions check out, we'll jump over unsuccess :D
+            success := 1
+        unsuccess:
+            // Now we have to compensate for the stack unbalance here because the stack
+            //  height analyser goes top-down opcode by opcode and not by control flow
+            //  v. http://solidity.readthedocs.io/en/develop/assembly.html#labels
+            42 // The meaning of life
+        }
+
+        return success;
+    }
+
+    function equalStorage(bytes storage _preBytes, bytes memory _postBytes) internal view returns (bool) {
+        bool success = false;
+
+        assembly {
+            // we know _preBytes_offset is 0
+            let fslot := sload(_preBytes_slot)
+            let slength := div(and(fslot, sub(mul(0x100, iszero(and(fslot, 1))), 1)), 2)
+            let mlength := mload(_postBytes)
+
+            // if lengths don't match the arrays are not equal
+            jumpi(unsuccess, iszero(eq(slength, mlength)))
+
+            // slength can contain both the length and contents of the array
+            // if length < 32 bytes so let's prepare for that
+            // v. http://solidity.readthedocs.io/en/latest/miscellaneous.html#layout-of-state-variables-in-storage
+            switch lt(slength, 32)
+            case 1 {
+                // blank the last byte which is the length
+                fslot := mul(div(fslot, 0x100), 0x100)
+
+                jumpi(unsuccess, iszero(eq(fslot, mload(add(_postBytes, 0x20)))))
+            }
+            default {
+                // get the keccak hash to get the contents of the array
+                mstore(0x0, _preBytes_slot)
+                let sc := keccak256(0x0, 0x20)
+                
+                let mc := add(_postBytes, 0x20)
+                let end := add(mc, mlength)
+                
+                for {} lt(mc, end) {
+                    sc := add(sc, 1)
+                    mc := add(mc, 0x20)
+                } {
+                    jumpi(unsuccess, iszero(eq(sload(sc), mload(mc))))
+                }
+            }
+
+            // success: all conditions check out, we'll jump over unsuccess :D
+            success := 1
+        unsuccess:
+            // Now we have to compensate for the stack unbalance here because the stack
+            //  height analyser goes top-down opcode by opcode and not by control flow
+            //  v. http://solidity.readthedocs.io/en/develop/assembly.html#labels
+            42 // The meaning of life
+        }
+
+        return success;
     }
 }
