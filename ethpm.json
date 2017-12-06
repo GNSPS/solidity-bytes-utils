@@ -1,0 +1,17 @@
+{
+  "package_name": "bytes",
+  "version": "0.0.1",
+  "description": "Solidity bytes tightly packed arrays utility library.",
+  "authors": [
+    "Gonçalo Sá <goncalo.sa@consensys.net>"
+  ],
+  "keywords": [
+    "bytes",
+    "utils",
+    "solidity",
+    "library"
+  ],
+  "dependencies": {
+  },
+  "license": "MIT"
+}
