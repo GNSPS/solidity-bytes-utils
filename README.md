@@ -37,7 +37,7 @@ Takes a 32-byte-long sequence present in a `bytes` array in memory and returns t
 Compares two `bytes` arrays in memory and returns the comparison result as a `bool` variable.
 
 
-* `function equalStorage(bytes memory _preBytes, bytes memory _postBytes) internal view returns (bool)`
+* `function equalStorage(bytes storage _preBytes, bytes memory _postBytes) internal view returns (bool)`
 
 Compares a `bytes` array in storage against another `bytes` array in memory and returns the comparison result as a `bool` variable.
 
