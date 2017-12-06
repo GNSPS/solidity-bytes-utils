@@ -2,8 +2,42 @@
 
 Bytes tightly packed arrays utility library for ethereum contracts written.
 
-Still not deployed on mainnet or EPM but Coming Soon™.
+Given this library has an all-internal collection of methods it doesn't make sense in having it reside in the mainnet. Instead it will only be available in EPM as an installable package.
 
+## Usage
+
+You can use the library here present by direct download and importing with:
+```
+import "BytesLib.sol";
+```
+
+or, if you have installed it from EPM (see below), with Truffle's specific paths:
+```
+import "bytes/BytesLib.sol";`
+```
+
+Usage examples and API are more thoroughly explained below.
+
+Also there's an extra library in there called `AssertBytes` (inside the same named file) which is compatible with Truffle's Solidity testing library `Assert.sol` event firing and so let's you now test bytes equalities/inequalities in your Solidity tests by just importing it in your `.sol` test files:
+```
+import "bytes/AssertBytes.sol";
+```
+
+and use the library `AssertByte` much like they use `Assert` in Truffle's [example](http://truffleframework.com/docs/getting_started/solidity-tests).
+
+## EthPM
+
+This library is published at EPM under the alias `bytes`
+
+**Installing it with Truffle**
+
+```
+truffle install bytes
+```
+
+## Contributing
+
+Contributions are more than welcome in any way shape or form! 😄
 
 ## API
 
