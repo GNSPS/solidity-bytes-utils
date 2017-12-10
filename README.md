@@ -2,6 +2,8 @@
 
 Bytes tightly packed arrays utility library for ethereum contracts written.
 
+The library lets you concatenate, slica and type cast bytes arrays both in memory and storage.
+
 Given this library has an all-internal collection of methods it doesn't make sense in having it reside in the mainnet. Instead it will only be available in EPM as an installable package.
 
 ## Usage
@@ -18,12 +20,12 @@ import "bytes/BytesLib.sol";`
 
 Usage examples and API are more thoroughly explained below.
 
-Also there's an extra library in there called `AssertBytes` (inside the same named file) which is compatible with Truffle's Solidity testing library `Assert.sol` event firing and so let's you now test bytes equalities/inequalities in your Solidity tests by just importing it in your `.sol` test files:
+Also there's an extra library in there called `AssertBytes` (inside the same named file) which is compatible with Truffle's Solidity testing library `Assert.sol` event firing and so lets you now test bytes equalities/inequalities in your Solidity tests by just importing it in your `.sol` test files:
 ```
 import "bytes/AssertBytes.sol";
 ```
 
-and use the library `AssertByte` much like they use `Assert` in Truffle's [example](http://truffleframework.com/docs/getting_started/solidity-tests).
+and use the library `AssertBytes` much like they use `Assert` in Truffle's [example](http://truffleframework.com/docs/getting_started/solidity-tests).
 
 ## EthPM
 
@@ -38,6 +40,11 @@ truffle install bytes
 ## Contributing
 
 Contributions are more than welcome in any way shape or form! 😄
+
+TODOs:
+* Two storage bytes arrays concatenation
+* Two storage bytes arrays concatenation
+* Slicing directly from storage
 
 ## API
 
@@ -81,23 +88,31 @@ Compares a `bytes` array in storage against another `bytes` array in memory and 
 Ordered to mimic the above `API` section ordering:
 
 ```javascript
-bytes memory _preBytes = hex"f00dfeed";
-bytes memory _postBytes = hex"f00dfeed";
+contract MyContract {
+	using BytesLib for bytes;
 
-bytes memory concatBytes = BytesLib.concat(_preBytes, _postBytes);
+	function myFunc() {
+		bytes memory _preBytes = hex"f00dfeed";
+		bytes memory _postBytes = hex"f00dfeed";
 
-// concatBytes == 0xf00dfeedf00dfeed
+		bytes memory concatBytes = _preBytes.concat(_postBytes);
+
+		// concatBytes == 0xf00dfeedf00dfeed
+	}
+}
 ```
 
 
 ```javascript
 contract MyContract {
+	using BytesLib for bytes;
+
 	bytes storageBytes = hex"f00dfeed";
 
 	function myFunc() {
 		bytes memory _postBytes = hex"f00dfeed";
 
-		BytesLib.concatStorage(storageBytes, _postBytes);
+		storageBytes.concatStorage(_postBytes);
 
 		// storageBytes == 0xf00dfeedf00dfeed
 	}
@@ -106,57 +121,84 @@ contract MyContract {
 
 
 ```javascript
-bytes memory memBytes = hex"f00dfeedaabbccddeeff";
+contract MyContract {
+	using BytesLib for bytes;
 
-bytes memory slice1 = BytesLib.slice(memBytes, 0, 2);
-bytes memory slice2 = BytesLib.slice(memBytes, 2, 2);
+	function myFunc() {
+		bytes memory memBytes = hex"f00dfeedaabbccddeeff";
 
-// slice1 == 0xf00d
-// slice2 == 0xfeed
-```
+		bytes memory slice1 = memBytes.slice(0, 2);
+		bytes memory slice2 = memBytes.slice(2, 2);
 
-
-```javascript
-bytes memory memBytes = hex"f00dfeed383FA3b60F9b4ab7FBF6835D3c26C3765Cd2B2E2f00dfeed";
-
-address addrFromBytes = BytesLib.toAddress(memBytes, 4);
-
-// addrFromBytes == 0x383FA3b60F9b4ab7FBF6835D3c26C3765Cd2B2E2
-```
-
-
-```javascript
-bytes memory memBytes = hex"f00dfeed383FA3b60F9b4ab7FBF6835D3c26C3765Cd2B2E2f00dfeed";
-
-address addrFromBytes = BytesLib.toAddress(memBytes, 4);
-
-// addrFromBytes == 0x383FA3b60F9b4ab7FBF6835D3c26C3765Cd2B2E2
-```
-
-
-```javascript
-bytes memory memBytes = hex"f00dfeed";
-bytes memory checkBytesTrue = hex"f00dfeed";
-bytes memory checkBytesFalse = hex"00000000";
-
-bool check1 = BytesLib.equal(memBytes, checkBytesTrue);
-bool check2 = BytesLib.equal(memBytes, checkBytesFalse);
-
-// check1 == true
-// check2 == false
+		// slice1 == 0xf00d
+		// slice2 == 0xfeed
+	}
+}
 ```
 
 
 ```javascript
 contract MyContract {
+	using BytesLib for bytes;
+
+	function myFunc() {
+		bytes memory memBytes = hex"f00dfeed383Fa3B60f9B4AB7fBf6835d3c26C3765cD2B2e2f00dfeed";
+
+		address addrFromBytes = memBytes.toAddress(4);
+
+		// addrFromBytes == 0x383Fa3B60f9B4AB7fBf6835d3c26C3765cD2B2e2
+	}
+}
+```
+
+
+```javascript
+contract MyContract {
+	using BytesLib for bytes;
+
+	function myFunc() {
+		bytes memory memBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000000042feed";
+
+		uint256 uintFromBytes = memBytes.toUint(2);
+
+		// uintFromBytes == 42
+	}
+}
+```
+
+
+```javascript
+contract MyContract {
+	using BytesLib for bytes;
+
+	function myFunc() {
+		bytes memory memBytes = hex"f00dfeed";
+		bytes memory checkBytesTrue = hex"f00dfeed";
+		bytes memory checkBytesFalse = hex"00000000";
+
+		bool check1 = memBytes.equal(checkBytesTrue);
+		bool check2 = memBytes.equal(checkBytesFalse);
+
+		// check1 == true
+		// check2 == false
+	}
+}
+```
+
+
+```javascript
+
+contract MyContract {
+	using BytesLib for bytes;
+
 	bytes storageBytes = hex"f00dfeed";
 
 	function myFunc() {
 		bytes memory checkBytesTrue = hex"f00dfeed";
 		bytes memory checkBytesFalse = hex"00000000";
 
-		bool check1 = BytesLib.equalStorage(storageBytes, checkBytesTrue);
-		bool check2 = BytesLib.equalStorage(storageBytes, checkBytesFalse);
+		bool check1 = storageBytes.equalStorage(checkBytesTrue);
+		bool check2 = storageBytes.equalStorage(checkBytesFalse);
 
 		// check1 == true
 		// check2 == false
