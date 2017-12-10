@@ -185,7 +185,7 @@ library BytesLib {
         address tempAddress;
         
         assembly {
-            mstore(tempAddress, div(mload(add(add(_bytes, 0x20), _start)), 0x1000000000000000000000000))
+            tempAddress := div(mload(add(add(_bytes, 0x20), _start)), 0x1000000000000000000000000)
         }
         
         return tempAddress;
@@ -196,7 +196,7 @@ library BytesLib {
         uint256 tempUint;
         
         assembly {
-            mstore(tempUint, mload(add(add(_bytes, 0x20), _start)))
+            tempUint := mload(add(add(_bytes, 0x20), _start))
         }
         
         return tempUint;
