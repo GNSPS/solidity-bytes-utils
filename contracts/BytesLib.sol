@@ -6,6 +6,8 @@ library BytesLib {
         bytes memory tempBytes;
         
         assembly {
+            tempBytes := mload(0x40)
+
             let length := mload(_preBytes)
             mstore(tempBytes, length)
             
@@ -152,6 +154,8 @@ library BytesLib {
         bytes memory tempBytes;
         
         assembly {
+            tempBytes := mload(0x40)
+            
             let lengthmod := and(_length, 31)
             
             let mc := add(tempBytes, lengthmod)

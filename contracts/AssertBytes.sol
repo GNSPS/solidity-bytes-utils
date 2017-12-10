@@ -1,11 +1,6 @@
 pragma solidity 0.4.19;
 
 
-/*
-*  This library doesn't enforce the 32-byte zero-padding the compiler
-*   does since newer versions and instead presupposes that inconsistencies
-*   wouldn't 
-*/
 library AssertBytes {
     // Event to maintain compatibility with Truffle's Assertion Lib
     event TestEvent(bool indexed result, string message);
