@@ -5,7 +5,7 @@ import "../contracts/AssertBytes.sol";
 import "../contracts/BytesLib.sol";
 
 
-contract TestBytesLib {
+contract TestBytesLib1 {
 
     using BytesLib for bytes;
 
@@ -33,11 +33,11 @@ contract TestBytesLib {
         bytes memory checkBytesRight = hex"aabbccddeeff";
         bytes memory checkBytesWrong = hex"000000";
 
-        AssertBytes.equal(checkBytes, checkBytesRight, "Sanity check should be checking equal strings out!!!");
-        AssertBytes.notEqual(checkBytes, checkBytesWrong, "Sanity check should be checking different strings out!!!");
+        AssertBytes.equal(checkBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out.");
+        AssertBytes.notEqual(checkBytes, checkBytesWrong, "Sanity check should be checking different bytes arrays out.");
 
-        AssertBytes.equalStorage(storageCheckBytes, checkBytesRight, "Sanity check should be checking equal strings out!!!");
-        AssertBytes.notEqualStorage(storageCheckBytes, checkBytesWrong, "Sanity check should be checking different strings out!!!");
+        AssertBytes.equalStorage(storageCheckBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out.");
+        AssertBytes.notEqualStorage(storageCheckBytes, checkBytesWrong, "Sanity check should be checking different bytes arrays out.");
     }
 
     /**
@@ -156,10 +156,6 @@ contract TestBytesLib {
 
         bytes memory testBytes;
         bytes memory resultBytes;
-
-        /*
-        * START 4-sized bytes tests
-        */
 
         resultBytes = preBytes4.concat(postBytes4);
         testBytes = hex"f00dfeedf00dfeed";
@@ -436,6 +432,23 @@ contract TestBytesLib {
 
         resetStorage();
 
+    }
+
+    /**
+    * Edge Cases
+    */
+
+    function testConcatMemoryZeroLength() public {
+        // Initialize `bytes` variables in memory with different critical sizes
+        bytes memory preZeroLength = hex"";
+        bytes memory postZeroLength = hex"";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        resultBytes = preZeroLength.concat(postZeroLength);
+        testBytes = hex"";
+        AssertBytes.equal(resultBytes, testBytes, "Zero Length concatenation failed.");
     }
 
     /**

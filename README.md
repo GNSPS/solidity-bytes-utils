@@ -47,6 +47,7 @@ TODOs:
 * Two storage bytes arrays concatenation
 * Two storage bytes arrays concatenation
 * Slicing directly from storage
+* Implement inline assembly functions for better readability
 
 ## API
 
