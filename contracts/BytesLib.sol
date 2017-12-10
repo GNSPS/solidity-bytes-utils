@@ -6,6 +6,8 @@ library BytesLib {
         bytes memory tempBytes;
         
         assembly {
+            tempBytes := mload(0x40)
+
             let length := mload(_preBytes)
             mstore(tempBytes, length)
             
@@ -38,7 +40,9 @@ library BytesLib {
             
             //update free-memory pointer
             //allocating the array padded to 32 bytes like the compiler does now
-            mstore(0x40, and(add(end, 31), not(31)))
+            //make an additional check for a resulting zero-length array:
+            //  if (sub - end == 0) then end = end + 1
+            mstore(0x40, and(add(add(end, iszero(sub(mc, end))), 31), not(31)))
         }
         
         return tempBytes;
@@ -152,25 +156,36 @@ library BytesLib {
         bytes memory tempBytes;
         
         assembly {
-            let lengthmod := and(_length, 31)
-            
-            let mc := add(tempBytes, lengthmod)
-            let end := add(mc, _length)
-            
-            for {
-                let cc := add(add(_bytes, lengthmod), _start)
-            } lt(mc, end) {
-                mc := add(mc, 0x20)
-                cc := add(cc, 0x20)
-            } {
-                mstore(mc, mload(cc))
+            switch iszero(_length)
+            case 0 {
+                tempBytes := mload(0x40)
+                
+                let lengthmod := and(_length, 31)
+                
+                let mc := add(tempBytes, lengthmod)
+                let end := add(mc, _length)
+                
+                for {
+                    let cc := add(add(_bytes, lengthmod), _start)
+                } lt(mc, end) {
+                    mc := add(mc, 0x20)
+                    cc := add(cc, 0x20)
+                } {
+                    mstore(mc, mload(cc))
+                }
+                
+                mstore(tempBytes, _length)
+                
+                //update free-memory pointer
+                //allocating the array padded to 32 bytes like the compiler does now
+                mstore(0x40, and(add(mc, 31), not(31)))
             }
-            
-            mstore(tempBytes, _length)
-            
-            //update free-memory pointer
-            //allocating the array padded to 32 bytes like the compiler does now
-            mstore(0x40, and(add(mc, 31), not(31)))
+            //if we want a zero-length slice let's just return a zero-length array
+            default {
+                tempBytes := mload(0x40)
+
+                mstore(0x40, add(tempBytes, 0x20))
+            }
         }
         
         return tempBytes;
@@ -181,7 +196,7 @@ library BytesLib {
         address tempAddress;
         
         assembly {
-            mstore(tempAddress, div(mload(add(add(_bytes, 0x20), _start)), 0x1000000000000000000000000))
+            tempAddress := div(mload(add(add(_bytes, 0x20), _start)), 0x1000000000000000000000000)
         }
         
         return tempAddress;
@@ -192,7 +207,7 @@ library BytesLib {
         uint256 tempUint;
         
         assembly {
-            mstore(tempUint, mload(add(add(_bytes, 0x20), _start)))
+            tempUint := mload(add(add(_bytes, 0x20), _start))
         }
         
         return tempUint;
