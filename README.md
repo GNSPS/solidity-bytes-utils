@@ -1,10 +1,10 @@
-[ ![Codeship Status for GNSPS/solidity-bytes-utils](https://app.codeship.com/projects/45b97080-bc0c-0135-fb75-76c2fb8e249b/status?branch=master)](https://app.codeship.com/projects/259449)
+![Codeship Status for GNSPS/solidity-bytes-utils](https://app.codeship.com/projects/45b97080-bc0c-0135-fb75-76c2fb8e249b/status?branch=master)
 
 # Solidity Bytes Arrays Utils
 
 Bytes tightly packed arrays utility library for ethereum contracts written.
 
-The library lets you concatenate, slica and type cast bytes arrays both in memory and storage.
+The library lets you concatenate, slice and type cast bytes arrays both in memory and storage.
 
 Given this library has an all-internal collection of methods it doesn't make sense in having it reside in the mainnet. Instead it will only be available in EPM as an installable package.
 
