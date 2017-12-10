@@ -1,3 +1,5 @@
+[ ![Codeship Status for GNSPS/solidity-bytes-utils](https://app.codeship.com/projects/45b97080-bc0c-0135-fb75-76c2fb8e249b/status?branch=master)](https://app.codeship.com/projects/259449)
+
 # Solidity Bytes Arrays Utils
 
 Bytes tightly packed arrays utility library for ethereum contracts written.
