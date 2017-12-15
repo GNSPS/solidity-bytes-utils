@@ -17,16 +17,31 @@ contract TestBytesLib2 {
 
     function testSanityCheck() public {
         // Assert library sanity checks
+        // 
+        // Please don't change the ordering of the var definitions
+        // the order is purposeful for testing zero-length arrays
         bytes memory checkBytes = hex"aabbccddeeff";
+        bytes memory checkBytesZeroLength = hex"";
 
         bytes memory checkBytesRight = hex"aabbccddeeff";
-        bytes memory checkBytesWrong = hex"000000";
+        bytes memory checkBytesZeroLengthRight = hex"";
+        bytes memory checkBytesWrongLength = hex"000000";
+        bytes memory checkBytesWrongContent = hex"aabbccddee00";
 
         AssertBytes.equal(checkBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out.");
-        AssertBytes.notEqual(checkBytes, checkBytesWrong, "Sanity check should be checking different bytes arrays out.");
+        AssertBytes.notEqual(checkBytes, checkBytesWrongLength, "Sanity check should be checking different length bytes arrays out.");
+        AssertBytes.notEqual(checkBytes, checkBytesWrongContent, "Sanity check should be checking different content bytes arrays out.");
 
-        AssertBytes.equalStorage(storageCheckBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out.");
-        AssertBytes.notEqualStorage(storageCheckBytes, checkBytesWrong, "Sanity check should be checking different bytes arrays out.");
+        AssertBytes.equalStorage(storageCheckBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out. (Storage)");
+        AssertBytes.notEqualStorage(storageCheckBytes, checkBytesWrongLength, "Sanity check should be checking different length bytes arrays out. (Storage)");
+        AssertBytes.notEqualStorage(storageCheckBytes, checkBytesWrongContent, "Sanity check should be checking different content bytes arrays out. (Storage)");
+
+        // Zero-length checks
+        AssertBytes.equal(checkBytesZeroLength, checkBytesZeroLengthRight, "Sanity check should be checking equal zero-length bytes arrays out.");
+        AssertBytes.notEqual(checkBytesZeroLength, checkBytes, "Sanity check should be checking different length bytes arrays out.");
+
+        AssertBytes.equalStorage(storageCheckBytesZeroLength, checkBytesZeroLengthRight, "Sanity check should be checking equal zero-length bytes arrays out. (Storage)");
+        AssertBytes.notEqualStorage(storageCheckBytesZeroLength, checkBytes, "Sanity check should be checking different length bytes arrays out. (Storage)");
     }
 
     /**
