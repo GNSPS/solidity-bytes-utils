@@ -10,6 +10,7 @@ contract TestBytesLib2 {
     using BytesLib for bytes;
 
     bytes storageCheckBytes = hex"aabbccddeeff";
+    bytes storageCheckBytesZeroLength = hex"";
 
     /**
     * Sanity Checks
@@ -25,7 +26,7 @@ contract TestBytesLib2 {
 
         bytes memory checkBytesRight = hex"aabbccddeeff";
         bytes memory checkBytesZeroLengthRight = hex"";
-        bytes memory checkBytesWrongLength = hex"000000";
+        bytes memory checkBytesWrongLength = hex"aa0000";
         bytes memory checkBytesWrongContent = hex"aabbccddee00";
 
         AssertBytes.equal(checkBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out.");
