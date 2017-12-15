@@ -277,9 +277,9 @@ library BytesLib {
                         // blank the last byte which is the length
                         fslot := mul(div(fslot, 0x100), 0x100)
 
-                        if iszero(eq(fslot, mload(add(_b, 0x20)))) {
+                        if iszero(eq(fslot, mload(add(_postBytes, 0x20)))) {
                             // unsuccess:
-                            returnBool := 0
+                            success := 0
                         }
                     }
                     default {
@@ -290,10 +290,10 @@ library BytesLib {
                         let cb := 1
 
                         // get the keccak hash to get the contents of the array
-                        mstore(0x0, _a_slot)
+                        mstore(0x0, _preBytes_slot)
                         let sc := keccak256(0x0, 0x20)
                         
-                        let mc := add(_b, 0x20)
+                        let mc := add(_postBytes, 0x20)
                         let end := add(mc, mlength)
 
                         // the next line is the loop condition:
@@ -304,7 +304,7 @@ library BytesLib {
                         } {
                             if iszero(eq(sload(sc), mload(mc))) {
                                 // unsuccess:
-                                returnBool := 0
+                                success := 0
                                 cb := 0
                             }
                         }
