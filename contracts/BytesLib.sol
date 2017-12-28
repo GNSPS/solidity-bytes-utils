@@ -4,31 +4,52 @@ pragma solidity 0.4.19;
 library BytesLib {
     function concat(bytes memory _preBytes, bytes memory _postBytes) internal pure returns (bytes) {
         bytes memory tempBytes;
-        
+
         assembly {
+            // Get a location of some free memory and store it in tempBytes as
+            // Solidity does for memory variables.
             tempBytes := mload(0x40)
 
+            // Store the length of the first bytes array at the beginning of
+            // the memory for tempBytes.
             let length := mload(_preBytes)
             mstore(tempBytes, length)
-            
+
+            // Maintain a memory counter for the current write location in the
+            // temp bytes array by adding the 32 bytes for the array length to
+            // the starting location.
             let mc := add(tempBytes, 0x20)
+            // Stop copying when the memory counter reaches the length of the
+            // first bytes array.
             let end := add(mc, length)
-            
+
             for {
+                // Initialize a copy counter to the start of the _preBytes data,
+                // 32 bytes into its memory.
                 let cc := add(_preBytes, 0x20)
             } lt(mc, end) {
+                // Increase both counters by 32 bytes each iteration.
                 mc := add(mc, 0x20)
                 cc := add(cc, 0x20)
             } {
+                // Write the _preBytes data into the tempBytes memory 32 bytes
+                // at a time.
                 mstore(mc, mload(cc))
             }
-            
+
+            // Add the length of _postBytes to the current length of tempBytes
+            // and store it as the new length in the first 32 bytes of the
+            // tempBytes memory.
             length := mload(_postBytes)
             mstore(tempBytes, add(length, mload(tempBytes)))
-            
+
+            // Move the memory counter back from a multiple of 0x20 to the
+            // actual end of the _preBytes data.
             mc := end
+            // Stop copying when the memory counter reaches the new combined
+            // length of the arrays.
             end := add(mc, length)
-            
+
             for {
                 let cc := add(_postBytes, 0x20)
             } lt(mc, end) {
@@ -37,17 +58,21 @@ library BytesLib {
             } {
                 mstore(mc, mload(cc))
             }
-            
-            //update free-memory pointer
-            //allocating the array padded to 32 bytes like the compiler does now
-            //make an additional check for a resulting zero-length array:
-            //  if (sub - end == 0) then end = end + 1
-            mstore(0x40, and(add(add(end, iszero(sub(mc, end))), 31), not(31)))
+
+            // Update the free-memory pointer by padding our last write location
+            // to 32 bytes: add 31 bytes to the end of tempBytes to move to the
+            // next 32 byte block, then round down to the nearest multiple of
+            // 32. If we wrote to a multiple of 32, add one before rounding down
+            // to leave a blank 32 bytes.
+            mstore(0x40, and(
+              add(add(end, iszero(sub(mc, end))), 31),
+              not(31) // Round down to the nearest 32 bytes.
+            ))
         }
-        
+
         return tempBytes;
     }
-    
+
     function concatStorage(bytes storage _preBytes, bytes memory _postBytes) internal {
         assembly {
             // we know _preBytes_offset is 0
@@ -66,7 +91,7 @@ library BytesLib {
                     // all the modifications to the slot are inside this
                     // next block
                     add(
-                        // we can just add to the slot contents because the 
+                        // we can just add to the slot contents because the
                         // bytes we want to change are the LSBs
                         fslot,
                         add(
@@ -92,15 +117,15 @@ library BytesLib {
                 // get the keccak hash to get the contents of the array
                 mstore(0x0, _preBytes_slot)
                 let sc := add(keccak256(0x0, 0x20), div(slength, 32))
-                
+
                 // save new length
                 sstore(_preBytes_slot, add(mul(newlength, 2), 1))
-                
+
                 let submod := sub(32, slength)
                 let mc := add(_postBytes, submod)
                 let end := add(add(_postBytes, 0x20), mlength)
                 let mask := sub(exp(0x100, submod), 1)
-                
+
                 sstore(
                     sc,
                     add(
@@ -111,8 +136,8 @@ library BytesLib {
                         and(mload(mc), mask)
                     )
                 )
-                
-                for { 
+
+                for {
                     mc := add(mc, 0x20)
                     sc := add(sc, 1)
                 } lt(mc, end) {
@@ -126,19 +151,19 @@ library BytesLib {
                 // get the keccak hash to get the contents of the array
                 mstore(0x0, _preBytes_slot)
                 let sc := add(keccak256(0x0, 0x20), div(slength, 32))
-                
+
                 // save new length
                 sstore(_preBytes_slot, add(mul(newlength, 2), 1))
-                
+
                 let slengthmod := mod(slength, 32)
                 let submod := sub(32, slengthmod)
                 let mc := add(_postBytes, submod)
                 let end := add(mc, mlength)
                 let mask := sub(exp(0x100, submod), 1)
-                
+
                 sstore(sc, add(sload(sc), and(mload(mc), mask)))
-                
-                for { 
+
+                for {
                     mc := add(mc, 0x20)
                 } lt(mc, end) {
                     sc := add(sc, 1)
@@ -149,22 +174,22 @@ library BytesLib {
             }
         }
     }
-    
+
     function slice(bytes _bytes, uint _start, uint _length) internal  pure returns (bytes) {
         require(_bytes.length >= (_start + _length));
-        
+
         bytes memory tempBytes;
-        
+
         assembly {
             switch iszero(_length)
             case 0 {
                 tempBytes := mload(0x40)
-                
+
                 let lengthmod := and(_length, 31)
-                
+
                 let mc := add(tempBytes, lengthmod)
                 let end := add(mc, _length)
-                
+
                 for {
                     let cc := add(add(_bytes, lengthmod), _start)
                 } lt(mc, end) {
@@ -173,9 +198,9 @@ library BytesLib {
                 } {
                     mstore(mc, mload(cc))
                 }
-                
+
                 mstore(tempBytes, _length)
-                
+
                 //update free-memory pointer
                 //allocating the array padded to 32 bytes like the compiler does now
                 mstore(0x40, and(add(mc, 31), not(31)))
@@ -187,29 +212,29 @@ library BytesLib {
                 mstore(0x40, add(tempBytes, 0x20))
             }
         }
-        
+
         return tempBytes;
     }
-    
+
     function toAddress(bytes _bytes, uint _start) internal  pure returns (address) {
         require(_bytes.length >= (_start + 20));
         address tempAddress;
-        
+
         assembly {
             tempAddress := div(mload(add(add(_bytes, 0x20), _start)), 0x1000000000000000000000000)
         }
-        
+
         return tempAddress;
     }
-    
+
     function toUint(bytes _bytes, uint _start) internal  pure returns (uint256) {
         require(_bytes.length >= (_start + 32));
         uint256 tempUint;
-        
+
         assembly {
             tempUint := mload(add(add(_bytes, 0x20), _start))
         }
-        
+
         return tempUint;
     }
 
@@ -222,7 +247,7 @@ library BytesLib {
             // if lengths don't match the arrays are not equal
             switch eq(length, mload(_postBytes))
             case 1 {
-                // cb is a circuit breaker in the for loop since there's 
+                // cb is a circuit breaker in the for loop since there's
                 //  no said feature for inline assembly loops
                 // cb = 1 - don't breaker
                 // cb = 0 - break
@@ -283,7 +308,7 @@ library BytesLib {
                         }
                     }
                     default {
-                        // cb is a circuit breaker in the for loop since there's 
+                        // cb is a circuit breaker in the for loop since there's
                         //  no said feature for inline assembly loops
                         // cb = 1 - don't breaker
                         // cb = 0 - break
@@ -292,7 +317,7 @@ library BytesLib {
                         // get the keccak hash to get the contents of the array
                         mstore(0x0, _preBytes_slot)
                         let sc := keccak256(0x0, 0x20)
-                        
+
                         let mc := add(_postBytes, 0x20)
                         let end := add(mc, mlength)
 
