@@ -330,6 +330,7 @@ library BytesLib {
         assembly {
             // we know _preBytes_offset is 0
             let fslot := sload(_preBytes_slot)
+            // Decode the length of the stored array like in concatStorage().
             let slength := div(and(fslot, sub(mul(0x100, iszero(and(fslot, 1))), 1)), 2)
             let mlength := mload(_postBytes)
 
