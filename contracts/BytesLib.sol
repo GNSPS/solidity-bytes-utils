@@ -62,7 +62,8 @@ library BytesLib {
             // Update the free-memory pointer by padding our last write location
             // to 32 bytes: add 31 bytes to the end of tempBytes to move to the
             // next 32 byte block, then round down to the nearest multiple of
-            // 32. If we wrote to a multiple of 32, add one before rounding down
+            // 32. If second array's length is a multiple of 32, mc will equal
+            // end after it's been copied. Add one before rounding down
             // to leave a blank 32 bytes.
             mstore(0x40, and(
               add(add(end, iszero(sub(mc, end))), 31),
