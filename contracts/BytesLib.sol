@@ -148,11 +148,6 @@ library BytesLib {
                 let end := add(add(_postBytes, 0x20), mlength)
                 let mask := sub(exp(0x100, submod), 1)
 
-                // FIXME: I think using add() to combine stored data with the
-                // concatenated bytes only works for arrays that have never
-                // been shortened by setting bytes.length, which will leave
-                // junk in the lowest-order bytes.
-
                 sstore(
                     sc,
                     add(
@@ -191,9 +186,6 @@ library BytesLib {
                 let end := add(mc, mlength)
                 let mask := sub(exp(0x100, submod), 1)
 
-                // FIXME: I think this only works for arrays that have never
-                // been shortened by setting bytes.length, which will leave
-                // junk in the lowest-order bytes.
                 sstore(sc, add(sload(sc), and(mload(mc), mask)))
 
                 for {
