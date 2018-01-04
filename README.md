@@ -49,15 +49,6 @@ TODOs:
 * Slicing directly from storage
 * Implement inline assembly functions for better readability
 
-### Testing
-
-This project uses Truffle for tests. Truffle's version of `solc` needs to be at least 0.4.19 for the contracts to compile. If you encounter compilation errors, try:
-
-    $ cd /usr/local/lib/node_modules/truffle
-    $ npm install solc@latest
-
-To run the tests, start a `testrpc` instance, then run `truffle test`.
-
 ## API
 
 * `function concat(bytes memory _preBytes, bytes memory _postBytes) internal pure returns (bytes)`
