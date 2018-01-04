@@ -216,8 +216,18 @@ library BytesLib {
         assembly {
             switch iszero(_length)
             case 0 {
+                // Get a location of some free memory and store it in tempBytes as
+                // Solidity does for memory variables.
                 tempBytes := mload(0x40)
 
+                // The first word of the slice result is potentially a partial
+                // word read from the original array. To read it, we calculate
+                // the length of that partial word and start copying that many
+                // bytes into the array. The first word we copy will start with
+                // data we don't care about, but the last `lengthmod` bytes will
+                // land at the beginning of the contents of the new array. When
+                // we're done copying, we overwrite the full first word with
+                // the actual length of the slice.
                 let lengthmod := and(_length, 31)
 
                 let mc := add(tempBytes, lengthmod)
