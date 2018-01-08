@@ -42,7 +42,7 @@ library BytesLib {
             //allocating the array padded to 32 bytes like the compiler does now
             //make an additional check for a resulting zero-length array:
             //  if (sub - end == 0) then end = end + 1
-            mstore(0x40, and(add(add(end, iszero(sub(mc, end))), 31), not(31)))
+            mstore(0x40, and(add(add(end, iszero(add(length, mload(_preBytes)))), 31), not(31)))
         }
         
         return tempBytes;
