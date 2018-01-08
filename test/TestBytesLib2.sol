@@ -29,6 +29,10 @@ contract TestBytesLib2 {
         bytes memory checkBytesWrongLength = hex"aa0000";
         bytes memory checkBytesWrongContent = hex"aabbccddee00";
 
+        // This next line is needed in order for Truffle to activate the Solidity unit testing feature
+        // otherwise it doesn't interpret any events fired as results of tests
+        Assert.equal(uint256(1), uint256(1), "This should not fail! :D");
+
         AssertBytes.equal(checkBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out.");
         AssertBytes.notEqual(checkBytes, checkBytesWrongLength, "Sanity check should be checking different length bytes arrays out.");
         AssertBytes.notEqual(checkBytes, checkBytesWrongContent, "Sanity check should be checking different content bytes arrays out.");
@@ -149,7 +153,7 @@ contract TestBytesLib2 {
         address resultAddress;
 
         resultAddress = memBytes.toAddress(4);
-        Assert.equal(resultAddress, testAddress, "Typecast to unsigned integer failed.");
+        Assert.equal(resultAddress, testAddress, "Typecast to address failed.");
 
         // Now we're going to test for slicing actions that throw present in the functions below
         // with a ThrowProxy contract

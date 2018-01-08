@@ -6,7 +6,7 @@ Bytes tightly packed arrays utility library for ethereum contracts written.
 
 The library lets you concatenate, slice and type cast bytes arrays both in memory and storage.
 
-Given this library has an all-internal collection of methods it doesn't make sense in having it reside in the mainnet. Instead it will only be available in EPM as an installable package.
+Given this library has an all-internal collection of methods it doesn't make sense having it reside in the mainnet. Instead it will only be available in EPM as an installable package.
 
 ## Usage
 

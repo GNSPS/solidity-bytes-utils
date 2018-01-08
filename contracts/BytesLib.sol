@@ -1,4 +1,4 @@
-pragma solidity 0.4.19;
+pragma solidity ^0.4.19;
 
 
 library BytesLib {
@@ -62,11 +62,10 @@ library BytesLib {
             // Update the free-memory pointer by padding our last write location
             // to 32 bytes: add 31 bytes to the end of tempBytes to move to the
             // next 32 byte block, then round down to the nearest multiple of
-            // 32. If second array's length is a multiple of 32, mc will equal
-            // end after it's been copied. Add one before rounding down
-            // to leave a blank 32 bytes.
+            // 32. If the sum of the length of the two arrays is zero then add 
+            // one before rounding down to leave a blank 32 bytes (the length block with 0).
             mstore(0x40, and(
-              add(add(end, iszero(sub(mc, end))), 31),
+              add(add(end, iszero(add(length, mload(_preBytes)))), 31),
               not(31) // Round down to the nearest 32 bytes.
             ))
         }
@@ -146,7 +145,7 @@ library BytesLib {
 
                 let submod := sub(32, slength)
                 let mc := add(_postBytes, submod)
-                let end := add(add(_postBytes, 0x20), mlength)
+                let end := add(_postBytes, mlength)
                 let mask := sub(exp(0x100, submod), 1)
 
                 sstore(
@@ -169,6 +168,10 @@ library BytesLib {
                 } {
                     sstore(sc, mload(mc))
                 }
+
+                mask := exp(0x100, sub(mc, end))
+
+                sstore(sc, mul(div(mload(mc), mask), mask))
             }
             default {
                 // get the keccak hash to get the contents of the array
@@ -182,14 +185,16 @@ library BytesLib {
                 // Copy over the first `submod` bytes of the new data as in
                 // case 1 above.
                 let slengthmod := mod(slength, 32)
+                let mlengthmod := mod(mlength, 32)
                 let submod := sub(32, slengthmod)
                 let mc := add(_postBytes, submod)
-                let end := add(mc, mlength)
+                let end := add(_postBytes, mlength)
                 let mask := sub(exp(0x100, submod), 1)
 
                 sstore(sc, add(sload(sc), and(mload(mc), mask)))
-
-                for {
+                
+                for { 
+                    sc := add(sc, 1)
                     mc := add(mc, 0x20)
                 } lt(mc, end) {
                     sc := add(sc, 1)
@@ -197,6 +202,10 @@ library BytesLib {
                 } {
                     sstore(sc, mload(mc))
                 }
+
+                mask := exp(0x100, sub(mc, end))
+
+                sstore(sc, mul(div(mload(mc), mask), mask))
             }
         }
     }
