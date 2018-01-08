@@ -293,6 +293,14 @@ contract TestBytesLib1 {
         // Initialize `bytes` variables in memory
         bytes memory memBytes4 = hex"f00dfeed";
 
+        // this next assembly block is to guarantee that the block of memory next to the end of the bytes
+        // array is not zero'ed out
+        assembly {
+            let mc := mload(0x40)
+            mstore(mc, 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
+            mstore(0x40, add(mc, 0x20))
+        }
+
         bytes memory testBytes;
 
         storageBytes4.concatStorage(memBytes4);
@@ -333,6 +341,14 @@ contract TestBytesLib1 {
     function testConcatStorage31Bytes() public {
         // Initialize `bytes` variables in memory
         bytes memory memBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+
+        // this next assembly block is to guarantee that the block of memory next to the end of the bytes
+        // array is not zero'ed out
+        assembly {
+            let mc := mload(0x40)
+            mstore(mc, 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
+            mstore(0x40, add(mc, 0x20))
+        }
 
         bytes memory testBytes;
 
@@ -375,6 +391,14 @@ contract TestBytesLib1 {
         // Initialize `bytes` variables in memory
         bytes memory memBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
 
+        // this next assembly block is to guarantee that the block of memory next to the end of the bytes
+        // array is not zero'ed out
+        assembly {
+            let mc := mload(0x40)
+            mstore(mc, 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
+            mstore(0x40, add(mc, 0x20))
+        }
+
         bytes memory testBytes;
 
         storageBytes4.concatStorage(memBytes32);
@@ -415,6 +439,14 @@ contract TestBytesLib1 {
     function testConcatStorage33Bytes() public {
         // Initialize `bytes` variables in memory
         bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        // this next assembly block is to guarantee that the block of memory next to the end of the bytes
+        // array is not zero'ed out
+        assembly {
+            let mc := mload(0x40)
+            mstore(mc, 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
+            mstore(0x40, add(mc, 0x20))
+        }
 
         bytes memory testBytes;
 

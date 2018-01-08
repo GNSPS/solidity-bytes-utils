@@ -98,7 +98,7 @@ library BytesLib {
                 
                 let submod := sub(32, slength)
                 let mc := add(_postBytes, submod)
-                let end := add(add(_postBytes, 0x20), mlength)
+                let end := add(_postBytes, mlength)
                 let mask := sub(exp(0x100, submod), 1)
                 
                 sstore(
@@ -121,6 +121,10 @@ library BytesLib {
                 } {
                     sstore(sc, mload(mc))
                 }
+
+                mask := exp(0x100, sub(mc, end))
+
+                sstore(sc, mul(div(mload(mc), mask), mask))
             }
             default {
                 // get the keccak hash to get the contents of the array
@@ -131,14 +135,16 @@ library BytesLib {
                 sstore(_preBytes_slot, add(mul(newlength, 2), 1))
                 
                 let slengthmod := mod(slength, 32)
+                let mlengthmod := mod(mlength, 32)
                 let submod := sub(32, slengthmod)
                 let mc := add(_postBytes, submod)
-                let end := add(mc, mlength)
+                let end := add(_postBytes, mlength)
                 let mask := sub(exp(0x100, submod), 1)
                 
                 sstore(sc, add(sload(sc), and(mload(mc), mask)))
                 
                 for { 
+                    sc := add(sc, 1)
                     mc := add(mc, 0x20)
                 } lt(mc, end) {
                     sc := add(sc, 1)
@@ -146,6 +152,10 @@ library BytesLib {
                 } {
                     sstore(sc, mload(mc))
                 }
+
+                mask := exp(0x100, sub(mc, end))
+
+                sstore(sc, mul(div(mload(mc), mask), mask))
             }
         }
     }
