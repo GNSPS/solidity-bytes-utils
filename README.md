@@ -6,7 +6,7 @@ Bytes tightly packed arrays utility library for ethereum contracts written.
 
 The library lets you concatenate, slice and type cast bytes arrays both in memory and storage.
 
-Given this library has an all-internal collection of methods it doesn't make sense in having it reside in the mainnet. Instead it will only be available in EPM as an installable package.
+Given this library has an all-internal collection of methods it doesn't make sense having it reside in the mainnet. Instead it will only be available in EPM as an installable package.
 
 ## Usage
 
@@ -48,6 +48,15 @@ TODOs:
 * Two storage bytes arrays concatenation
 * Slicing directly from storage
 * Implement inline assembly functions for better readability
+
+### Testing
+
+This project uses Truffle for tests. Truffle's version of `solc` needs to be at least 0.4.19 for the contracts to compile. If you encounter compilation errors, try:
+
+    $ cd /usr/local/lib/node_modules/truffle
+    $ npm install solc@latest
+
+To run the tests, start a `testrpc` instance, then run `truffle test`.
 
 ## API
 
