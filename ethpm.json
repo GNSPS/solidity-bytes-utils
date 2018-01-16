@@ -1,6 +1,6 @@
 {
   "package_name": "bytes",
-  "version": "0.0.3-ac.2",
+  "version": "0.0.4",
   "description": "Solidity bytes tightly packed arrays utility library.",
   "authors": [
     "Gonçalo Sá <goncalo.sa@consensys.net>"
