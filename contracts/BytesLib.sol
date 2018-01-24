@@ -390,4 +390,20 @@ library BytesLib {
 
         return success;
     }
+    
+    function toBytes32(bytes b) internal pure returns (bytes32) {
+      bytes32 out;
+      for (uint i = 0; i < 32; i++) {
+        out |= bytes32(b[i] & 0xFF) >> (i * 8);
+      }
+      return out;
+    }
+
+    function fromBytes32(bytes32 b) internal constant returns (bytes) {
+      bytes memory out = new bytes(32);
+      for (uint i = 0; i < 32; i++) {
+        out[i] = b[i];
+      }
+      return out;
+    }
 }
