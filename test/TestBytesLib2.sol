@@ -78,6 +78,10 @@ contract TestBytesLib2 {
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
         resultBytes = memBytes33.slice(0,33);
         AssertBytes.equal(resultBytes, testBytes, "Full length slice failed.");
+        
+        testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000fe";
+        resultBytes = memBytes33.slice(0,32);
+        AssertBytes.equal(resultBytes, testBytes, "Multiple of 32 bytes slice failed.");
 
         // Now we're going to test for slicing actions that throw present in the functions below
         // with a ThrowProxy contract
