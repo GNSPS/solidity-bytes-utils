@@ -1,6 +1,6 @@
 {
   "name": "solidity-bytes-utils",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Solidity bytes tightly packed arrays utility library.",
   "main": "truffle.js",
   "repository": {
