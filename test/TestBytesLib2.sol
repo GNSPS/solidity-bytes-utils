@@ -54,34 +54,38 @@ contract TestBytesLib2 {
     */
 
     function testSlice() public {
-        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+        bytes memory memBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000feed";
 
         bytes memory testBytes;
         bytes memory resultBytes;
         
         testBytes = hex"f00d";
-        resultBytes = memBytes33.slice(0,2);
+        resultBytes = memBytes.slice(0,2);
         AssertBytes.equal(resultBytes, testBytes, "Normal slicing array failed.");
         
         testBytes = hex"";
-        resultBytes = memBytes33.slice(1,0);
+        resultBytes = memBytes.slice(1,0);
         AssertBytes.equal(resultBytes, testBytes, "Slicing with zero-length failed.");
         
         testBytes = hex"";
-        resultBytes = memBytes33.slice(0,0);
+        resultBytes = memBytes.slice(0,0);
         AssertBytes.equal(resultBytes, testBytes, "Slicing with zero-length on index 0 failed.");
         
         testBytes = hex"feed";
-        resultBytes = memBytes33.slice(31,2);
+        resultBytes = memBytes.slice(31,2);
         AssertBytes.equal(resultBytes, testBytes, "Slicing across the 32-byte slot boundary failed.");
         
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
-        resultBytes = memBytes33.slice(0,33);
+        resultBytes = memBytes.slice(0,33);
         AssertBytes.equal(resultBytes, testBytes, "Full length slice failed.");
         
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000fe";
-        resultBytes = memBytes33.slice(0,32);
+        resultBytes = memBytes.slice(0,32);
         AssertBytes.equal(resultBytes, testBytes, "Multiple of 32 bytes slice failed.");
+        
+        testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000fe";
+        resultBytes = memBytes.slice(0,64);
+        AssertBytes.equal(resultBytes, testBytes, "Multiple (*2) of 32 bytes slice failed.");
 
         // Now we're going to test for slicing actions that throw present in the functions below
         // with a ThrowProxy contract
