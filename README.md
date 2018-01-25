@@ -2,7 +2,7 @@
 
 # Solidity Bytes Arrays Utils
 
-Bytes tightly packed arrays utility library for ethereum contracts written.
+Bytes tightly packed arrays utility library for ethereum contracts written in Solidity.
 
 The library lets you concatenate, slice and type cast bytes arrays both in memory and storage.
 
