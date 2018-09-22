@@ -36,17 +36,23 @@ This library is published in EPM under the alias `bytes`
 **Installing it with Truffle**
 
 ```
-truffle install bytes
+$ truffle install bytes
 ```
 
 ## NPM
 
 This library is published in NPM under the alias `solidity-bytes-utils`
 
-**Installing it with Truffle**
+**Installing it with NPM**
 
 ```
-npm install solidity-bytes-utils
+$ npm install solidity-bytes-utils
+```
+
+**Importing it in your Solidity contract**
+
+```
+import "solidity-bytes-utils/BytesLib.sol";
 ```
 
 ## Contributing
