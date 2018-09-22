@@ -1,4 +1,4 @@
-pragma solidity ^0.4.17;
+pragma solidity ^0.4.22;
 
 import "truffle/Assert.sol";
 import "../contracts/AssertBytes.sol";
@@ -189,7 +189,7 @@ contract ThrowProxy {
     address public target;
     bytes data;
 
-    function ThrowProxy(address _target) public {
+    constructor(address _target) public {
         target = _target;
     }
 

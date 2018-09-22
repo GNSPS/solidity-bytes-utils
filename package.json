@@ -7,6 +7,10 @@
     "type": "git",
     "url": "git@github.com:GNSPS/solidity-bytes-utils.git"
   },
+  "files": [
+    "contracts",
+    "test"
+  ],
   "keywords": [
     "ethereum",
     "bytes",
@@ -22,7 +26,9 @@
   },
   "homepage": "https://github.com/GNSPS/solidity-bytes-utils#readme",
   "dependencies": {
-    "truffle": "4.0.1",
     "truffle-hdwallet-provider": "0.0.3"
+  },
+  "devDependencies": {
+    "truffle": "^4.1.11"
   }
 }

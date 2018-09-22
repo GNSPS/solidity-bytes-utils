@@ -1,4 +1,12 @@
-pragma solidity ^0.4.19;
+/*
+ * @title Solidity Bytes Assertion Library 
+ * @author Gonçalo Sá <goncalo.sa@consensys.net>
+ *
+ * @dev A Solidity library built to complete assertions in Solidity unit tests.
+ *      This library is compliant with the test event convention that the Truffle suite uses.
+ */
+
+ pragma solidity ^0.4.21;
 
 
 library AssertBytes {
@@ -185,8 +193,8 @@ library AssertBytes {
 
     function _report(bool result, string message) internal {
         if (result)
-            TestEvent(true, "");
+            emit TestEvent(true, "");
         else
-            TestEvent(false, message);
+            emit TestEvent(false, message);
     }
 }
