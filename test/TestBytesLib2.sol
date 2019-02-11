@@ -126,6 +126,90 @@ contract TestBytesLib2 {
         // This should throw;
     }
 
+    function testToUint8() public {
+        bytes memory memBytes = hex"f00d20feed";
+
+        uint8 testUint8 = 32; // 0x20 == 32
+        uint8 resultUint8;
+
+        resultUint8 = memBytes.toUint8(2);
+        Assert.equal(uint256(resultUint8), uint256(testUint8), "Typecast to 8-bit-wide unsigned integer failed.");
+
+        // Now we're going to test for slicing actions that throw present in the functions below
+        // with a ThrowProxy contract
+        // v. http://truffleframework.com/tutorials/testing-for-throws-in-solidity-tests
+        ThrowProxy throwProxy = new ThrowProxy(address(this));
+
+        TestBytesLib2(address(throwProxy)).toUint8Throw();
+        bool r = throwProxy.execute.gas(100000)();
+        Assert.isFalse(r, "Typecasting with wrong index should throw");
+    }
+
+    function toUint8Throw() public pure {
+        bytes memory memBytes = hex"f00d42feed";
+
+        uint8 resultUint8;
+
+        resultUint8 = memBytes.toUint8(35);
+        // This should throw;
+    }
+
+    function testToUint16() public {
+        bytes memory memBytes = hex"f00d0020feed";
+
+        uint16 testUint16 = 32; // 0x20 == 32
+        uint16 resultUint16;
+
+        resultUint16 = memBytes.toUint16(2);
+        Assert.equal(uint256(resultUint16), uint256(testUint16), "Typecast to 16-bit-wide unsigned integer failed.");
+
+        // Now we're going to test for slicing actions that throw present in the functions below
+        // with a ThrowProxy contract
+        // v. http://truffleframework.com/tutorials/testing-for-throws-in-solidity-tests
+        ThrowProxy throwProxy = new ThrowProxy(address(this));
+
+        TestBytesLib2(address(throwProxy)).toUint16Throw();
+        bool r = throwProxy.execute.gas(100000)();
+        Assert.isFalse(r, "Typecasting with wrong index should throw");
+    }
+
+    function toUint16Throw() public pure {
+        bytes memory memBytes = hex"f00d0042feed";
+
+        uint16 resultUint16;
+
+        resultUint16 = memBytes.toUint16(35);
+        // This should throw;
+    }
+
+    function testToUint32() public {
+        bytes memory memBytes = hex"f00d00000020feed";
+
+        uint32 testUint32 = 32; // 0x20 == 32
+        uint32 resultUint32;
+
+        resultUint32 = memBytes.toUint32(2);
+        Assert.equal(uint256(resultUint32), uint256(testUint32), "Typecast to 32-bit-wide unsigned integer failed.");
+
+        // Now we're going to test for slicing actions that throw present in the functions below
+        // with a ThrowProxy contract
+        // v. http://truffleframework.com/tutorials/testing-for-throws-in-solidity-tests
+        ThrowProxy throwProxy = new ThrowProxy(address(this));
+
+        TestBytesLib2(address(throwProxy)).toUint32Throw();
+        bool r = throwProxy.execute.gas(100000)();
+        Assert.isFalse(r, "Typecasting with wrong index should throw");
+    }
+
+    function toUint32Throw() public pure {
+        bytes memory memBytes = hex"f00d00000042feed";
+
+        uint32 resultUint32;
+
+        resultUint32 = memBytes.toUint32(35);
+        // This should throw;
+    }
+
     function testToUint() public {
         bytes memory memBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000000020feed";
 
@@ -133,7 +217,7 @@ contract TestBytesLib2 {
         uint256 resultUint;
 
         resultUint = memBytes.toUint(2);
-        Assert.equal(resultUint, testUint, "Typecast to unsigned integer failed.");
+        Assert.equal(resultUint, testUint, "Typecast to 256-bit-wide unsigned integer failed.");
 
         // Now we're going to test for slicing actions that throw present in the functions below
         // with a ThrowProxy contract
