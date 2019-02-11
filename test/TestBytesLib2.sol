@@ -133,7 +133,7 @@ contract TestBytesLib2 {
         uint8 resultUint8;
 
         resultUint8 = memBytes.toUint8(2);
-        assert(resultUint8 == testUint8);
+        Assert.equal(uint256(resultUint8), uint256(testUint8), "Typecast to 8-bit-wide unsigned integer failed.");
 
         // Now we're going to test for slicing actions that throw present in the functions below
         // with a ThrowProxy contract
@@ -161,7 +161,7 @@ contract TestBytesLib2 {
         uint16 resultUint16;
 
         resultUint16 = memBytes.toUint16(2);
-        assert(resultUint16 == testUint16);
+        Assert.equal(uint256(resultUint16), uint256(testUint16), "Typecast to 16-bit-wide unsigned integer failed.");
 
         // Now we're going to test for slicing actions that throw present in the functions below
         // with a ThrowProxy contract
@@ -189,7 +189,7 @@ contract TestBytesLib2 {
         uint32 resultUint32;
 
         resultUint32 = memBytes.toUint32(2);
-        assert(resultUint32 == testUint32);
+        Assert.equal(uint256(resultUint32), uint256(testUint32), "Typecast to 32-bit-wide unsigned integer failed.");
 
         // Now we're going to test for slicing actions that throw present in the functions below
         // with a ThrowProxy contract
@@ -217,7 +217,7 @@ contract TestBytesLib2 {
         uint256 resultUint;
 
         resultUint = memBytes.toUint(2);
-        Assert.equal(resultUint, testUint, "Typecast to unsigned integer failed.");
+        Assert.equal(resultUint, testUint, "Typecast to 256-bit-wide unsigned integer failed.");
 
         // Now we're going to test for slicing actions that throw present in the functions below
         // with a ThrowProxy contract
