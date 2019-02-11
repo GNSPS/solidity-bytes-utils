@@ -286,6 +286,39 @@ library BytesLib {
         return tempAddress;
     }
 
+    function toUint8(bytes _bytes, uint _start) internal  pure returns (uint8) {
+        require(_bytes.length >= (_start + 1));
+        uint8 tempUint;
+
+        assembly {
+            tempUint := mload(add(add(_bytes, 0x1), _start))
+        }
+
+        return tempUint;
+    }
+
+    function toUint16(bytes _bytes, uint _start) internal  pure returns (uint16) {
+        require(_bytes.length >= (_start + 2));
+        uint16 tempUint;
+
+        assembly {
+            tempUint := mload(add(add(_bytes, 0x2), _start))
+        }
+
+        return tempUint;
+    }
+
+    function toUint32(bytes _bytes, uint _start) internal  pure returns (uint32) {
+        require(_bytes.length >= (_start + 4));
+        uint32 tempUint;
+
+        assembly {
+            tempUint := mload(add(add(_bytes, 0x4), _start))
+        }
+
+        return tempUint;
+    }
+
     function toUint(bytes _bytes, uint _start) internal  pure returns (uint256) {
         require(_bytes.length >= (_start + 32));
         uint256 tempUint;
