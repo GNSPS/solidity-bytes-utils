@@ -31,12 +31,28 @@ and use the library `AssertBytes` much like they use `Assert` in Truffle's [exam
 
 ## EthPM
 
-This library is published at EPM under the alias `bytes`
+This library is published in EPM under the alias `bytes`
 
 **Installing it with Truffle**
 
 ```
-truffle install bytes
+$ truffle install bytes
+```
+
+## NPM
+
+This library is published in NPM under the alias `solidity-bytes-utils`
+
+**Installing it with NPM**
+
+```
+$ npm install solidity-bytes-utils
+```
+
+**Importing it in your Solidity contract**
+
+```
+import "solidity-bytes-utils/BytesLib.sol";
 ```
 
 ## Contributing
