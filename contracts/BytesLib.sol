@@ -291,7 +291,7 @@ library BytesLib {
         uint8 tempUint;
 
         assembly {
-            tempUint := mload(add(add(_bytes, 0x20), _start))
+            tempUint := mload(add(add(_bytes, 0x1), _start))
         }
 
         return tempUint;
@@ -302,7 +302,7 @@ library BytesLib {
         uint16 tempUint;
 
         assembly {
-            tempUint := mload(add(add(_bytes, 0x20), _start))
+            tempUint := mload(add(add(_bytes, 0x2), _start))
         }
 
         return tempUint;
@@ -313,7 +313,7 @@ library BytesLib {
         uint32 tempUint;
 
         assembly {
-            tempUint := mload(add(add(_bytes, 0x20), _start))
+            tempUint := mload(add(add(_bytes, 0x4), _start))
         }
 
         return tempUint;
