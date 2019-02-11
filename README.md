@@ -17,7 +17,7 @@ import "BytesLib.sol";
 
 or, if you have installed it from EPM (see below), with Truffle's specific paths:
 ```
-import "bytes/BytesLib.sol";`
+import "bytes/BytesLib.sol";
 ```
 
 Usage examples and API are more thoroughly explained below.
