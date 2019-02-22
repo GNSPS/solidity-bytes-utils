@@ -1,4 +1,4 @@
-pragma solidity ^0.4.22;
+pragma solidity ^0.5.0;
 
 import "truffle/Assert.sol";
 import "../contracts/AssertBytes.sol";
@@ -278,11 +278,12 @@ contract ThrowProxy {
     }
 
     //prime the data using the fallback function.
-    function() public {
+    function() external {
         data = msg.data;
     }
 
-    function execute() public returns (bool) {
-        return target.call(data);
+    function execute() public returns (bool success) {
+        bytes memory fughedaboutit;
+        (success, fughedaboutit) = target.call(data);
     }
 }
