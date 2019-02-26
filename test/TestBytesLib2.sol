@@ -1,4 +1,4 @@
-pragma solidity ^0.4.22;
+pragma solidity ^0.5.0;
 
 import "truffle/Assert.sol";
 import "../contracts/AssertBytes.sol";
@@ -87,18 +87,18 @@ contract TestBytesLib2 {
         resultBytes = memBytes.slice(0,64);
         AssertBytes.equal(resultBytes, testBytes, "Multiple (*2) of 32 bytes slice failed.");
 
-        // Now we're going to test for slicing actions that throw present in the functions below
-        // with a ThrowProxy contract
-        // v. http://truffleframework.com/tutorials/testing-for-throws-in-solidity-tests
-        ThrowProxy throwProxy = new ThrowProxy(address(this));
+        // With v0.5.x we can now entirely replace the ThrowProxy patterns that was creating issues with the js-vm
+        // and use an external call to our own contract with the function selector, since Solidity now gives us
+        // access to those
         bool r;
 
-        TestBytesLib2(address(throwProxy)).sliceIndexThrow();
-        r = throwProxy.execute.gas(100000)();
+        // We're basically calling our contract externally with a raw call, forwarding all available gas, with 
+        // msg.data equal to the throwing function selector that we want to be sure throws and using only the boolean
+        // value associated with the message call's success
+        (r, ) = address(this).call(abi.encodePacked(this.sliceIndexThrow.selector));
         Assert.isFalse(r, "Slicing with wrong index should throw");
 
-        TestBytesLib2(address(throwProxy)).sliceLengthThrow();
-        r = throwProxy.execute.gas(100000)();
+        (r, ) = address(this).call(abi.encodePacked(this.sliceLengthThrow.selector));
         Assert.isFalse(r, "Slicing with wrong length should throw");
     }
 
@@ -135,13 +135,8 @@ contract TestBytesLib2 {
         resultUint8 = memBytes.toUint8(2);
         Assert.equal(uint256(resultUint8), uint256(testUint8), "Typecast to 8-bit-wide unsigned integer failed.");
 
-        // Now we're going to test for slicing actions that throw present in the functions below
-        // with a ThrowProxy contract
-        // v. http://truffleframework.com/tutorials/testing-for-throws-in-solidity-tests
-        ThrowProxy throwProxy = new ThrowProxy(address(this));
-
-        TestBytesLib2(address(throwProxy)).toUint8Throw();
-        bool r = throwProxy.execute.gas(100000)();
+        // Testing for the throw conditions below
+        (bool r, ) = address(this).call(abi.encodePacked(this.toUint8Throw.selector));
         Assert.isFalse(r, "Typecasting with wrong index should throw");
     }
 
@@ -163,13 +158,8 @@ contract TestBytesLib2 {
         resultUint16 = memBytes.toUint16(2);
         Assert.equal(uint256(resultUint16), uint256(testUint16), "Typecast to 16-bit-wide unsigned integer failed.");
 
-        // Now we're going to test for slicing actions that throw present in the functions below
-        // with a ThrowProxy contract
-        // v. http://truffleframework.com/tutorials/testing-for-throws-in-solidity-tests
-        ThrowProxy throwProxy = new ThrowProxy(address(this));
-
-        TestBytesLib2(address(throwProxy)).toUint16Throw();
-        bool r = throwProxy.execute.gas(100000)();
+        // Testing for the throw conditions below
+        (bool r, ) = address(this).call(abi.encodePacked(this.toUint16Throw.selector));
         Assert.isFalse(r, "Typecasting with wrong index should throw");
     }
 
@@ -191,13 +181,8 @@ contract TestBytesLib2 {
         resultUint32 = memBytes.toUint32(2);
         Assert.equal(uint256(resultUint32), uint256(testUint32), "Typecast to 32-bit-wide unsigned integer failed.");
 
-        // Now we're going to test for slicing actions that throw present in the functions below
-        // with a ThrowProxy contract
-        // v. http://truffleframework.com/tutorials/testing-for-throws-in-solidity-tests
-        ThrowProxy throwProxy = new ThrowProxy(address(this));
-
-        TestBytesLib2(address(throwProxy)).toUint32Throw();
-        bool r = throwProxy.execute.gas(100000)();
+        // Testing for the throw conditions below
+        (bool r, ) = address(this).call(abi.encodePacked(this.toUint32Throw.selector));
         Assert.isFalse(r, "Typecasting with wrong index should throw");
     }
 
@@ -219,13 +204,8 @@ contract TestBytesLib2 {
         resultUint = memBytes.toUint(2);
         Assert.equal(resultUint, testUint, "Typecast to 256-bit-wide unsigned integer failed.");
 
-        // Now we're going to test for slicing actions that throw present in the functions below
-        // with a ThrowProxy contract
-        // v. http://truffleframework.com/tutorials/testing-for-throws-in-solidity-tests
-        ThrowProxy throwProxy = new ThrowProxy(address(this));
-
-        TestBytesLib2(address(throwProxy)).toUintThrow();
-        bool r = throwProxy.execute.gas(100000)();
+        // Testing for the throw conditions below
+        (bool r, ) = address(this).call(abi.encodePacked(this.toUintThrow.selector));
         Assert.isFalse(r, "Typecasting with wrong index should throw");
     }
 
@@ -247,13 +227,8 @@ contract TestBytesLib2 {
         resultAddress = memBytes.toAddress(4);
         Assert.equal(resultAddress, testAddress, "Typecast to address failed.");
 
-        // Now we're going to test for slicing actions that throw present in the functions below
-        // with a ThrowProxy contract
-        // v. http://truffleframework.com/tutorials/testing-for-throws-in-solidity-tests
-        ThrowProxy throwProxy = new ThrowProxy(address(this));
-
-        TestBytesLib2(address(throwProxy)).toAddressThrow();
-        bool r = throwProxy.execute.gas(100000)();
+        // Testing for the throw conditions below
+        (bool r, ) = address(this).call(abi.encodePacked(this.toAddressThrow.selector));
         Assert.isFalse(r, "Typecasting with wrong index should throw");
     }
 
@@ -266,23 +241,4 @@ contract TestBytesLib2 {
         // This should throw;
     }
 
-}
-
-// Proxy contract for testing throws
-contract ThrowProxy {
-    address public target;
-    bytes data;
-
-    constructor(address _target) public {
-        target = _target;
-    }
-
-    //prime the data using the fallback function.
-    function() public {
-        data = msg.data;
-    }
-
-    function execute() public returns (bool) {
-        return target.call(data);
-    }
 }

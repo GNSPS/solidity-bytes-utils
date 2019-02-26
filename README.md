@@ -8,6 +8,15 @@ The library lets you concatenate, slice and type cast bytes arrays both in memor
 
 Given this library has an all-internal collection of methods it doesn't make sense having it reside in the mainnet. Instead it will only be available in EPM as an installable package.
 
+_Note_: Since version `v0.0.7` the library will only compile on Solidity versions `>0.4.22` so, if you need `v0.4.x` support for your project just use `v0.0.6` of the library with:
+```
+$ truffle install bytes@0.0.6
+```
+or
+```
+$ npm install solidity-bytes-utils@0.0.6
+```
+
 ## Usage
 
 You can use the library here present by direct download and importing with:
@@ -60,7 +69,6 @@ import "solidity-bytes-utils/BytesLib.sol";
 Contributions are more than welcome in any way shape or form! 😄
 
 TODOs:
-* Two storage bytes arrays concatenation
 * Two storage bytes arrays concatenation
 * Slicing directly from storage
 * Implement inline assembly functions for better readability
