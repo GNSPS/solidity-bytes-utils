@@ -196,7 +196,7 @@ contract TestBytesLib2 {
     }
 
     function testToUint64() public {
-        bytes memory memBytes = hex"f0000000000000000020feed";
+        bytes memory memBytes = hex"f00d0000000000000020feed";
 
         uint64 testUint64 = 32; // 0x20 == 32
         uint64 resultUint64;
@@ -218,7 +218,7 @@ contract TestBytesLib2 {
     }
 
     function testToUint96() public {
-        bytes memory memBytes = hex"f000000000000000000000000020feed";
+        bytes memory memBytes = hex"f00d000000000000000000000020feed";
 
         uint96 testUint96 = 32; // 0x20 == 32
         uint96 resultUint96;
@@ -240,7 +240,7 @@ contract TestBytesLib2 {
     }
 
     function testToUint128() public {
-        bytes memory memBytes = hex"f00000000000000000000000000000000020feed";
+        bytes memory memBytes = hex"f00d00000000000000000000000000000020feed";
 
         uint128 testUint128 = 32; // 0x20 == 32
         uint128 resultUint128;
