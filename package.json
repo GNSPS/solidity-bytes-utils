@@ -29,6 +29,6 @@
     "truffle-hdwallet-provider": "0.0.3"
   },
   "devDependencies": {
-    "truffle": "^5.0.5"
+    "truffle": "^5.0.24"
   }
 }
