@@ -195,6 +195,72 @@ contract TestBytesLib2 {
         // This should throw;
     }
 
+    function testToUint64() public {
+        bytes memory memBytes = hex"f00d0000000000000020feed";
+
+        uint64 testUint64 = 32; // 0x20 == 32
+        uint64 resultUint64;
+
+        resultUint64 = memBytes.toUint64(2);
+        Assert.equal(uint256(resultUint64), uint256(testUint64), "Typecast to 64-bit-wide unsigned integer failed.");
+
+        // Testing for the throw conditions below
+        (bool r, ) = address(this).call(abi.encodePacked(this.toUint64Throw.selector));
+        Assert.isFalse(r, "Typecasting with wrong index should throw");
+    }
+
+    function toUint64Throw() public pure {
+        bytes memory memBytes = hex"f00d42feed";
+
+        uint64 resultUint64;
+
+        resultUint64 = memBytes.toUint64(35);  // This should throw;
+    }
+
+    function testToUint96() public {
+        bytes memory memBytes = hex"f00d000000000000000000000020feed";
+
+        uint96 testUint96 = 32; // 0x20 == 32
+        uint96 resultUint96;
+
+        resultUint96 = memBytes.toUint96(2);
+        Assert.equal(uint256(resultUint96), uint256(testUint96), "Typecast to 96-bit-wide unsigned integer failed.");
+
+        // Testing for the throw conditions below
+        (bool r, ) = address(this).call(abi.encodePacked(this.toUint64Throw.selector));
+        Assert.isFalse(r, "Typecasting with wrong index should throw");
+    }
+
+    function toUint96Throw() public pure {
+        bytes memory memBytes = hex"f00d42feed";
+
+        uint96 resultUint96;
+
+        resultUint96 = memBytes.toUint96(35);  // This should throw;
+    }
+
+    function testToUint128() public {
+        bytes memory memBytes = hex"f00d00000000000000000000000000000020feed";
+
+        uint128 testUint128 = 32; // 0x20 == 32
+        uint128 resultUint128;
+
+        resultUint128 = memBytes.toUint128(2);
+        Assert.equal(uint256(resultUint128), uint256(testUint128), "Typecast to 128-bit-wide unsigned integer failed.");
+
+        // Testing for the throw conditions below
+        (bool r, ) = address(this).call(abi.encodePacked(this.toUint128Throw.selector));
+        Assert.isFalse(r, "Typecasting with wrong index should throw");
+    }
+
+    function toUint128Throw() public pure {
+        bytes memory memBytes = hex"f00d42feed";
+
+        uint128 resultUint128;
+
+        resultUint128 = memBytes.toUint128(35);  // This should throw;
+    }
+
     function testToUint() public {
         bytes memory memBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000000020feed";
 

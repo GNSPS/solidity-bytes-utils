@@ -334,6 +334,39 @@ library BytesLib {
         return tempUint;
     }
 
+    function toUint64(bytes memory _bytes, uint _start) internal  pure returns (uint64) {
+        require(_bytes.length >= (_start + 8));
+        uint64 tempUint;
+
+        assembly {
+            tempUint := mload(add(add(_bytes, 0x8), _start))
+        }
+
+        return tempUint;
+    }
+
+    function toUint96(bytes memory _bytes, uint _start) internal  pure returns (uint96) {
+        require(_bytes.length >= (_start + 12));
+        uint96 tempUint;
+
+        assembly {
+            tempUint := mload(add(add(_bytes, 0xc), _start))
+        }
+
+        return tempUint;
+    }
+
+    function toUint128(bytes memory _bytes, uint _start) internal  pure returns (uint128) {
+        require(_bytes.length >= (_start + 16));
+        uint128 tempUint;
+
+        assembly {
+            tempUint := mload(add(add(_bytes, 0x10), _start))
+        }
+
+        return tempUint;
+    }
+
     function toUint(bytes memory _bytes, uint _start) internal  pure returns (uint256) {
         require(_bytes.length >= (_start + 32));
         uint256 tempUint;
