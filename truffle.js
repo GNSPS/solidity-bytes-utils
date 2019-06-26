@@ -16,7 +16,7 @@ if (fs.existsSync('secrets.json')) {
 module.exports = {
   networks: {
     live: {
-      provider: new HDWalletProvider(mnemonic, 'https://mainnet.infura.io'),
+      provider: new HDWalletProvider(mnemonic, 'https://mainnet.infura.io/v3/130dfea36eb541b79694f0b6c003b2b2'),
       network_id: 1 // Ethereum public network
       // optional config values
       // host - defaults to "localhost"
@@ -26,7 +26,7 @@ module.exports = {
       // from - default address to use for any transaction Truffle makes during migrations
     },
     ropsten: {
-      provider: new HDWalletProvider(mnemonic, 'https://ropsten.infura.io'),
+      provider: new HDWalletProvider(mnemonic, 'https://ropsten.infura.io/v3/130dfea36eb541b79694f0b6c003b2b2'),
       network_id: '3'
     },
     development: {
