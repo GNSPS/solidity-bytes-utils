@@ -61,7 +61,7 @@ $ npm install solidity-bytes-utils
 **Importing it in your Solidity contract**
 
 ```
-import "solidity-bytes-utils/BytesLib.sol";
+import "solidity-bytes-utils/contracts/BytesLib.sol";
 ```
 
 ## Contributing
