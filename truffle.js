@@ -10,7 +10,8 @@ if (fs.existsSync('secrets.json')) {
 } else {
   console.log('No secrets.json found. If you are trying to publish EPM ' +
               'this will fail. Otherwise, you can ignore this message!')
-  mnemonic = ''
+  // Example mnemonic below. PLEASE DON'T USE FOR ANYTHING ELSE!
+  mnemonic = 'wrist find shock leisure stand barely field sunset script evidence key idea diesel journey gravity'
 }
 
 module.exports = {
