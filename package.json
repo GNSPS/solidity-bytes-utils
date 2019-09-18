@@ -7,9 +7,6 @@
     "type": "git",
     "url": "git@github.com:GNSPS/solidity-bytes-utils.git"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@GNSPS"
-  },
   "files": [
     "contracts",
     "test"
