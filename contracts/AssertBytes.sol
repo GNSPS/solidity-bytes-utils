@@ -6,7 +6,7 @@
  *      This library is compliant with the test event convention that the Truffle suite uses.
  */
 
- pragma solidity ^0.5.14;
+pragma solidity ^0.5.14;
 
 
 library AssertBytes {
@@ -190,7 +190,6 @@ library AssertBytes {
             result (bool) - The test result (true or false).
             message (string) - The message that is sent if the assertion fails.
     */
-
     function _report(bool result, string memory message) internal {
         if (result)
             emit TestEvent(true, "");
