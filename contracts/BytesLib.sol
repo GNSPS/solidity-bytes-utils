@@ -5,8 +5,7 @@
  * @dev Bytes tightly packed arrays utility library for ethereum contracts written in Solidity.
  *      The library lets you concatenate, slice and type cast bytes arrays both in memory and storage.
  */
-
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.14;
 
 
 library BytesLib {
@@ -77,7 +76,7 @@ library BytesLib {
             // Update the free-memory pointer by padding our last write location
             // to 32 bytes: add 31 bytes to the end of tempBytes to move to the
             // next 32 byte block, then round down to the nearest multiple of
-            // 32. If the sum of the length of the two arrays is zero then add 
+            // 32. If the sum of the length of the two arrays is zero then add
             // one before rounding down to leave a blank 32 bytes (the length block with 0).
             mstore(0x40, and(
               add(add(end, iszero(add(length, mload(_preBytes)))), 31),
@@ -207,8 +206,8 @@ library BytesLib {
                 let mask := sub(exp(0x100, submod), 1)
 
                 sstore(sc, add(sload(sc), and(mload(mc), mask)))
-                
-                for { 
+
+                for {
                     sc := add(sc, 1)
                     mc := add(mc, 0x20)
                 } lt(mc, end) {

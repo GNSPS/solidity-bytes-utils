@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.14;
 
 import "truffle/Assert.sol";
 import "../contracts/AssertBytes.sol";
@@ -6,7 +6,6 @@ import "../contracts/BytesLib.sol";
 
 
 contract TestBytesLib1 {
-
     using BytesLib for bytes;
 
     bytes storageCheckBytes = hex"aabbccddeeff";
@@ -29,7 +28,7 @@ contract TestBytesLib1 {
 
     function testSanityCheck() public {
         // Assert library sanity checks
-        // 
+        //
         // Please don't change the ordering of the var definitions
         // the order is purposeful for testing zero-length arrays
         bytes memory checkBytes = hex"aabbccddeeff";
@@ -75,7 +74,7 @@ contract TestBytesLib1 {
         bytes memory resultBytes;
 
         resultBytes = preBytes4.concat(postBytes4);
-        
+
         // Now we should make sure that all the other previously initialized arrays stayed the same
         testBytes = hex"f00dfeed";
         AssertBytes.equal(preBytes4, testBytes, "After a postBytes4 concat the preBytes4 integrity check failed.");
@@ -158,7 +157,6 @@ contract TestBytesLib1 {
         AssertBytes.equal(postBytes32, testBytes, "After a postBytes33 concat the postBytes32 integrity check failed.");
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
         AssertBytes.equal(postBytes33, testBytes, "After a postBytes33 concat the postBytes33 integrity check failed.");
-
     }
 
     /**
@@ -200,7 +198,7 @@ contract TestBytesLib1 {
         bytes memory preBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
         bytes memory preBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
         bytes memory preBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
-        
+
         bytes memory postBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
 
         bytes memory testBytes;
@@ -258,11 +256,6 @@ contract TestBytesLib1 {
         bytes memory preBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
         bytes memory preBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
         bytes memory preBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
-        // And another set of the same to concatenate with
-        bytes memory postBytes4 = hex"f00dfeed";
-        bytes memory postBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
-        bytes memory postBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
-        bytes memory postBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
 
         bytes memory testBytes;
         bytes memory resultBytes;
@@ -282,7 +275,6 @@ contract TestBytesLib1 {
         resultBytes = preBytes33.concat(postBytes33);
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feedf00d0000000000000000000000000000000000000000000000000000000000feed";
         AssertBytes.equal(resultBytes, testBytes, "preBytes33 + postBytes33 concatenation failed.");
-
     }
 
     /**
@@ -483,7 +475,6 @@ contract TestBytesLib1 {
         AssertBytes.equalStorage(storageBytes70, testBytes, "storageBytes70 + memBytes33 concatenation failed.");
 
         resetStorage();
-
     }
 
     /**
@@ -517,5 +508,4 @@ contract TestBytesLib1 {
         storageBytes65 = hex"f00d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000feed";
         storageBytes70 = hex"f00d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000feed";
     }
-
 }

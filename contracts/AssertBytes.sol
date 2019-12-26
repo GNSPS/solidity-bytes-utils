@@ -1,12 +1,12 @@
 /*
- * @title Solidity Bytes Assertion Library 
+ * @title Solidity Bytes Assertion Library
  * @author Gonçalo Sá <goncalo.sa@consensys.net>
  *
  * @dev A Solidity library built to complete assertions in Solidity unit tests.
  *      This library is compliant with the test event convention that the Truffle suite uses.
  */
 
- pragma solidity ^0.5.0;
+pragma solidity ^0.5.14;
 
 
 library AssertBytes {
@@ -35,7 +35,7 @@ library AssertBytes {
             // if lengths don't match the arrays are not equal
             switch eq(length, mload(_b))
             case 1 {
-                // cb is a circuit breaker in the for loop since there's 
+                // cb is a circuit breaker in the for loop since there's
                 //  no said feature for inline assembly loops
                 // cb = 1 - don't breaker
                 // cb = 0 - break
@@ -125,7 +125,7 @@ library AssertBytes {
                         }
                     }
                     default {
-                        // cb is a circuit breaker in the for loop since there's 
+                        // cb is a circuit breaker in the for loop since there's
                         //  no said feature for inline assembly loops
                         // cb = 1 - don't breaker
                         // cb = 0 - break
@@ -134,7 +134,7 @@ library AssertBytes {
                         // get the keccak hash to get the contents of the array
                         mstore(0x0, _a_slot)
                         let sc := keccak256(0x0, 0x20)
-                        
+
                         let mc := add(_b, 0x20)
                         let end := add(mc, mlength)
 
@@ -190,7 +190,6 @@ library AssertBytes {
             result (bool) - The test result (true or false).
             message (string) - The message that is sent if the assertion fails.
     */
-
     function _report(bool result, string memory message) internal {
         if (result)
             emit TestEvent(true, "");

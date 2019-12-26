@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.14;
 
 import "truffle/Assert.sol";
 import "../contracts/AssertBytes.sol";
@@ -6,7 +6,6 @@ import "../contracts/BytesLib.sol";
 
 
 contract TestBytesLib2 {
-
     using BytesLib for bytes;
 
     bytes storageCheckBytes = hex"aabbccddeeff";
@@ -18,7 +17,7 @@ contract TestBytesLib2 {
 
     function testSanityCheck() public {
         // Assert library sanity checks
-        // 
+        //
         // Please don't change the ordering of the var definitions
         // the order is purposeful for testing zero-length arrays
         bytes memory checkBytes = hex"aabbccddeeff";
@@ -58,31 +57,31 @@ contract TestBytesLib2 {
 
         bytes memory testBytes;
         bytes memory resultBytes;
-        
+
         testBytes = hex"f00d";
         resultBytes = memBytes.slice(0,2);
         AssertBytes.equal(resultBytes, testBytes, "Normal slicing array failed.");
-        
+
         testBytes = hex"";
         resultBytes = memBytes.slice(1,0);
         AssertBytes.equal(resultBytes, testBytes, "Slicing with zero-length failed.");
-        
+
         testBytes = hex"";
         resultBytes = memBytes.slice(0,0);
         AssertBytes.equal(resultBytes, testBytes, "Slicing with zero-length on index 0 failed.");
-        
+
         testBytes = hex"feed";
         resultBytes = memBytes.slice(31,2);
         AssertBytes.equal(resultBytes, testBytes, "Slicing across the 32-byte slot boundary failed.");
-        
+
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
         resultBytes = memBytes.slice(0,33);
         AssertBytes.equal(resultBytes, testBytes, "Full length slice failed.");
-        
+
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000fe";
         resultBytes = memBytes.slice(0,32);
         AssertBytes.equal(resultBytes, testBytes, "Multiple of 32 bytes slice failed.");
-        
+
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000fe";
         resultBytes = memBytes.slice(0,64);
         AssertBytes.equal(resultBytes, testBytes, "Multiple (*2) of 32 bytes slice failed.");
@@ -92,7 +91,7 @@ contract TestBytesLib2 {
         // access to those
         bool r;
 
-        // We're basically calling our contract externally with a raw call, forwarding all available gas, with 
+        // We're basically calling our contract externally with a raw call, forwarding all available gas, with
         // msg.data equal to the throwing function selector that we want to be sure throws and using only the boolean
         // value associated with the message call's success
         (r, ) = address(this).call(abi.encodePacked(this.sliceIndexThrow.selector));
@@ -102,25 +101,23 @@ contract TestBytesLib2 {
         Assert.isFalse(r, "Slicing with wrong length should throw");
     }
 
-
     function sliceIndexThrow() public pure {
         bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
 
         bytes memory testBytes;
         bytes memory resultBytes;
-        
+
         testBytes = hex"f00d";
         resultBytes = memBytes33.slice(34,2);
         // This should throw;
     }
-
 
     function sliceLengthThrow() public pure {
         bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
 
         bytes memory testBytes;
         bytes memory resultBytes;
-        
+
         testBytes = hex"f00d";
         resultBytes = memBytes33.slice(0,34);
         // This should throw;
@@ -306,5 +303,4 @@ contract TestBytesLib2 {
         resultAddress = memBytes.toAddress(35);
         // This should throw;
     }
-
 }
