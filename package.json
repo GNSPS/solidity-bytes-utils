@@ -29,6 +29,7 @@
     "truffle-hdwallet-provider": "1.0.6"
   },
   "devDependencies": {
+    "ethlint": "^1.2.5",
     "truffle": "latest"
   }
 }
