@@ -139,7 +139,7 @@ library AssertBytes {
                         let end := add(mc, mlength)
 
                         // the next line is the loop condition:
-                        // while(256(mc < end) + cb == 2)
+                        // while(uint256(mc < end) + cb == 2)
                         for {} eq(add(lt(mc, end), cb), 2) {
                             sc := add(sc, 1)
                             mc := add(mc, 0x20)
