@@ -300,8 +300,8 @@ library BytesLib {
         return tempAddress;
     }
 
-        require(_bytes.length >= (_start + 1));
     function toUint8(bytes memory _bytes, uint256 _start) internal pure returns (uint8) {
+        require(_bytes.length >= (_start + 1), "Read out of bounds");
         uint8 tempUint;
 
         assembly {
@@ -311,8 +311,8 @@ library BytesLib {
         return tempUint;
     }
 
-        require(_bytes.length >= (_start + 2));
     function toUint16(bytes memory _bytes, uint256 _start) internal pure returns (uint16) {
+        require(_bytes.length >= (_start + 2), "Read out of bounds");
         uint16 tempUint;
 
         assembly {
