@@ -264,7 +264,7 @@ contract TestBytesLib2 {
         uint256 testUint = 32; // 0x20 == 32
         uint256 resultUint;
 
-        resultUint = memBytes.toUint(2);
+        resultUint = memBytes.toUint256(2);
         Assert.equal(resultUint, testUint, "Typecast to 256-bit-wide unsigned integer failed.");
 
         // Testing for the throw conditions below
@@ -277,7 +277,7 @@ contract TestBytesLib2 {
 
         uint256 resultUint;
 
-        resultUint = memBytes.toUint(35);
+        resultUint = memBytes.toUint256(35);
         // This should throw;
     }
 
