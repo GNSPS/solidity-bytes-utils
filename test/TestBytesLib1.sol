@@ -256,6 +256,11 @@ contract TestBytesLib1 {
         bytes memory preBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
         bytes memory preBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
         bytes memory preBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+        // And another set of the same to concatenate with
+         bytes memory postBytes4 = hex"f00dfeed";
+         bytes memory postBytes31 = hex"f00d000000000000000000000000000000000000000000000000000000feed";
+         bytes memory postBytes32 = hex"f00d00000000000000000000000000000000000000000000000000000000feed";
+         bytes memory postBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
 
         bytes memory testBytes;
         bytes memory resultBytes;
