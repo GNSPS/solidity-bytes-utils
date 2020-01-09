@@ -15,8 +15,10 @@ library BytesLib {
     )
         internal
         pure
-        returns (bytes memory tempBytes)
+        returns (bytes memory)
     {
+        bytes memory tempBytes;
+
         assembly {
             // Get a location of some free memory and store it in tempBytes as
             // Solidity does for memory variables.
@@ -81,6 +83,8 @@ library BytesLib {
               not(31) // Round down to the nearest 32 bytes.
             ))
         }
+
+        return tempBytes;
     }
 
     function concatStorage(bytes storage _preBytes, bytes memory _postBytes) internal {
@@ -227,9 +231,11 @@ library BytesLib {
     )
         internal
         pure
-        returns (bytes memory tempBytes)
+        returns (bytes memory)
     {
         require(_bytes.length >= (_start + _length), "Read out of bounds");
+
+        bytes memory tempBytes;
 
         assembly {
             switch iszero(_length)
@@ -279,82 +285,111 @@ library BytesLib {
                 mstore(0x40, add(tempBytes, 0x20))
             }
         }
+
+        return tempBytes;
     }
 
-    function toAddress(bytes memory _bytes, uint256 _start) internal pure returns (address ret) {
+    function toAddress(bytes memory _bytes, uint256 _start) internal pure returns (address) {
         require(_bytes.length >= (_start + 20), "Read out of bounds");
+        address tempAddress;
 
         assembly {
-            ret := div(mload(add(add(_bytes, 0x20), _start)), 0x1000000000000000000000000)
+            tempAddress := div(mload(add(add(_bytes, 0x20), _start)), 0x1000000000000000000000000)
         }
+
+        return tempAddress;
     }
 
-    function toUint8(bytes memory _bytes, uint256 _start) internal pure returns (uint8 ret) {
         require(_bytes.length >= (_start + 1));
+    function toUint8(bytes memory _bytes, uint256 _start) internal pure returns (uint8) {
+        uint8 tempUint;
 
         assembly {
-            ret := mload(add(add(_bytes, 0x1), _start))
+            tempUint := mload(add(add(_bytes, 0x1), _start))
         }
+
+        return tempUint;
     }
 
-    function toUint16(bytes memory _bytes, uint256 _start) internal pure returns (uint16 ret) {
         require(_bytes.length >= (_start + 2));
+    function toUint16(bytes memory _bytes, uint256 _start) internal pure returns (uint16) {
+        uint16 tempUint;
 
         assembly {
-            ret := mload(add(add(_bytes, 0x2), _start))
+            tempUint := mload(add(add(_bytes, 0x2), _start))
         }
+
+        return tempUint;
     }
 
-    function toUint32(bytes memory _bytes, uint256 _start) internal pure returns (uint32 ret) {
+    function toUint32(bytes memory _bytes, uint256 _start) internal pure returns (uint32) {
         require(_bytes.length >= (_start + 4), "Read out of bounds");
+        uint32 tempUint;
 
         assembly {
-            ret := mload(add(add(_bytes, 0x4), _start))
+            tempUint := mload(add(add(_bytes, 0x4), _start))
         }
+
+        return tempUint;
     }
 
-    function toUint64(bytes memory _bytes, uint256 _start) internal pure returns (uint64 ret) {
+    function toUint64(bytes memory _bytes, uint256 _start) internal pure returns (uint64) {
         require(_bytes.length >= (_start + 8), "Read out of bounds");
+        uint64 tempUint;
 
         assembly {
-            ret := mload(add(add(_bytes, 0x8), _start))
+            tempUint := mload(add(add(_bytes, 0x8), _start))
         }
+
+        return tempUint;
     }
 
-    function toUint96(bytes memory _bytes, uint256 _start) internal pure returns (uint96 ret) {
+    function toUint96(bytes memory _bytes, uint256 _start) internal pure returns (uint96) {
         require(_bytes.length >= (_start + 12), "Read out of bounds");
+        uint96 tempUint;
 
         assembly {
-            ret := mload(add(add(_bytes, 0xc), _start))
+            tempUint := mload(add(add(_bytes, 0xc), _start))
         }
+
+        return tempUint;
     }
 
-    function toUint128(bytes memory _bytes, uint256 _start) internal pure returns (uint128 ret) {
+    function toUint128(bytes memory _bytes, uint256 _start) internal pure returns (uint128) {
         require(_bytes.length >= (_start + 16), "Read out of bounds");
+        uint128 tempUint;
 
         assembly {
-            ret := mload(add(add(_bytes, 0x10), _start))
+            tempUint := mload(add(add(_bytes, 0x10), _start))
         }
+
+        return tempUint;
     }
 
-    function toUint256(bytes memory _bytes, uint256 _start) internal pure returns (uint256 ret) {
+    function toUint256(bytes memory _bytes, uint256 _start) internal pure returns (uint256) {
         require(_bytes.length >= (_start + 32), "Read out of bounds");
+        uint256 tempUint;
 
         assembly {
-            ret := mload(add(add(_bytes, 0x20), _start))
+            tempUint := mload(add(add(_bytes, 0x20), _start))
         }
+
+        return tempUint;
     }
 
-    function toBytes32(bytes memory _bytes, uint256 _start) internal pure returns (bytes32 tempBytes32) {
+    function toBytes32(bytes memory _bytes, uint256 _start) internal pure returns (bytes32) {
         require(_bytes.length >= (_start + 32), "Read out of bounds");
+        bytes32 tempBytes32;
 
         assembly {
             tempBytes32 := mload(add(add(_bytes, 0x20), _start))
         }
+
+        return tempBytes32;
     }
 
-    function equal(bytes memory _preBytes, bytes memory _postBytes) internal pure returns (bool success) {
-        success = true;
+    function equal(bytes memory _preBytes, bytes memory _postBytes) internal pure returns (bool) {
+        bool success = true;
 
         assembly {
             let length := mload(_preBytes)
@@ -392,6 +427,8 @@ library BytesLib {
                 success := 0
             }
         }
+
+        return success;
     }
 
     function equalStorage(
@@ -400,9 +437,9 @@ library BytesLib {
     )
         internal
         view
-        returns (bool success)
+        returns (bool)
     {
-        success = true;
+        bool success = true;
 
         assembly {
             // we know _preBytes_offset is 0
@@ -462,5 +499,7 @@ library BytesLib {
                 success := 0
             }
         }
+
+        return success;
     }
 }
