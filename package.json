@@ -30,6 +30,6 @@
   },
   "devDependencies": {
     "ethlint": "^1.2.5",
-    "truffle": "^5.0.24"
+    "truffle": "latest"
   }
 }
