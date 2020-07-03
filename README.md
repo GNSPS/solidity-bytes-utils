@@ -8,7 +8,12 @@ The library lets you concatenate, slice and type cast bytes arrays both in memor
 
 Given this library has an all-internal collection of methods it doesn't make sense having it reside in the mainnet. Instead it will only be available in EPM as an installable package.
 
-_Note_: Since version `v0.0.7` the library will only compile on Solidity versions `>0.4.22` so, if you need `v0.4.x` support for your project just use `v0.0.6` of the library with:
+_Version Notes_:
+
+* Version `v0.9.0` now compiles with Solidity compilers `0.5.x` and `0.6.x`.
+
+* Since version `v0.0.7` the library will only compile on Solidity versions `>0.4.22` so, if you need `v0.4.x` support for your project just use `v0.0.6` of the library with:
+
 ```
 $ truffle install bytes@0.0.6
 ```

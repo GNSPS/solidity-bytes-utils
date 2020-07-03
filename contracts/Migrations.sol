@@ -1,4 +1,5 @@
-pragma solidity ^0.5.14;
+// SPDX-License-Identifier: Unlicense
+pragma solidity >=0.5.0 <0.7.0;
 
 
 

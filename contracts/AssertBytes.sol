@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Unlicense
 /*
  * @title Solidity Bytes Assertion Library
  * @author Gonçalo Sá <goncalo.sa@consensys.net>
@@ -6,7 +7,7 @@
  *      This library is compliant with the test event convention that the Truffle suite uses.
  */
 
-pragma solidity ^0.5.0;
+pragma solidity >=0.5.0 <0.7.0;
 
 
 library AssertBytes {
