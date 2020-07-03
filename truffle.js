@@ -1,4 +1,4 @@
-const HDWalletProvider = require('truffle-hdwallet-provider')
+const HDWalletProvider = require('@truffle/hdwallet-provider')
 const fs = require('fs')
 
 // First read in the secrets.json to get our mnemonic
@@ -17,7 +17,7 @@ if (fs.existsSync('secrets.json')) {
 module.exports = {
   networks: {
     live: {
-      provider: new HDWalletProvider(mnemonic, 'https://mainnet.infura.io/v3/130dfea36eb541b79694f0b6c003b2b2'),
+      provider: () => new HDWalletProvider(mnemonic, 'https://mainnet.infura.io/v3/130dfea36eb541b79694f0b6c003b2b2'),
       network_id: 1 // Ethereum public network
       // optional config values
       // host - defaults to "localhost"
@@ -27,7 +27,7 @@ module.exports = {
       // from - default address to use for any transaction Truffle makes during migrations
     },
     ropsten: {
-      provider: new HDWalletProvider(mnemonic, 'https://ropsten.infura.io/v3/130dfea36eb541b79694f0b6c003b2b2'),
+      provider: () => new HDWalletProvider(mnemonic, 'https://ropsten.infura.io/v3/130dfea36eb541b79694f0b6c003b2b2'),
       network_id: '3'
     },
     development: {
@@ -43,7 +43,7 @@ module.exports = {
   },
   compilers: {
     solc: {
-      version: "0.5.14", // A version or constraint - Ex. "^0.5.0"
+      version: "0.6.10", // A version or constraint - Ex. "^0.5.0"
     }
   }
 };
