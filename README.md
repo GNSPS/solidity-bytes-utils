@@ -18,9 +18,9 @@ However, as noted in the review mentioned above, this is not the case. The `slic
 
 This made me realize that in permissioned blockchains where gas is also not a limiting factor this could become problematic in other methods and so I updated all typecasting-related methods to include new bound checks as well.
 
-TL;DR: if you're using the `slice` method with user-supplied inputs in your codebase please update the bytes library immediately!
+**TL;DR: if you're using the `slice` method with user-supplied inputs in your codebase please update the bytes library immediately!**
 
-_Version Notes_:
+## _Version Notes_:
 
 * Version `v0.9.0` now compiles with Solidity compilers `0.5.x` and `0.6.x`.
 
