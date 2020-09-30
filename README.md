@@ -8,6 +8,18 @@ The library lets you concatenate, slice and type cast bytes arrays both in memor
 
 Given this library has an all-internal collection of methods it doesn't make sense having it reside in the mainnet. Instead it will only be available in EPM as an installable package.
 
+## Important Fixes Changelog
+
+There was a **critical bug** in the `slice` method, reported on an audit to a DXDao codebase.
+
+Previously, no checks were being made on overflows of the `_start` and `_length` parameters since previous reviews of the codebase deemed this overflow "unexploitable" because of an inordinate expansion of memory (i.e., reading an immensely large memory offset causing huge memory expansion) resulting in an out-of-gas exception.
+
+However, as noted in the review mentioned above, this is not the case. The `slice` method in versions `<=0.9.0` actually allows for arbitrary _kind of_ (i.e., it allows memory writes to very specific values) arbitrary memory writes _in the specific case where these parameters are user-supplied inputs and not hardcoded values (which is uncommon).
+
+This made me realize that in permissioned blockchains where gas is also not a limiting factor this could become problematic in other methods and so I updated all typecasting-related methods to include new bound checks as well.
+
+TL;DR: if you're using the `slice` method with user-supplied inputs in your codebase please update the bytes library immediately!
+
 _Version Notes_:
 
 * Version `v0.9.0` now compiles with Solidity compilers `0.5.x` and `0.6.x`.
