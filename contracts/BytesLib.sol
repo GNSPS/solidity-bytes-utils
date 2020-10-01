@@ -234,7 +234,8 @@ library BytesLib {
         pure
         returns (bytes memory)
     {
-        require(_start + _length + 31 >= _start, "slice_overflow");
+        require(_length + 31 >= _length, "slice_overflow");
+        require(_start + _length >= _start, "slice_overflow");
         require(_bytes.length >= _start + _length, "slice_outOfBounds");
 
         bytes memory tempBytes;
