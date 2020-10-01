@@ -12,6 +12,8 @@ contract TestBytesLib2 {
     bytes storageCheckBytes = hex"aabbccddeeff";
     bytes storageCheckBytesZeroLength = hex"";
 
+    uint256 constant MAX_UINT = uint256(-1);
+
     /**
     * Sanity Checks
     */
@@ -98,6 +100,27 @@ contract TestBytesLib2 {
         (r, ) = address(this).call(abi.encodePacked(this.sliceIndexThrow.selector));
         Assert.isFalse(r, "Slicing with wrong index should throw");
 
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowLength0Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in length and _start 0 should throw");
+
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowLength1Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in length and _start 1 should throw");
+
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowLength33Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in length and _start 33 should throw");
+
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowLengthMinus32Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in length minus 32 and _start 1 should throw");
+
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowStart0Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in _start and length 0 should throw");
+
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowStart1Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in _start and length 1 should throw");
+
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowStart33Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in _start and length 33 should throw");
+
         (r, ) = address(this).call(abi.encodePacked(this.sliceLengthThrow.selector));
         Assert.isFalse(r, "Slicing with wrong length should throw");
     }
@@ -121,6 +144,83 @@ contract TestBytesLib2 {
 
         testBytes = hex"f00d";
         resultBytes = memBytes33.slice(0,34);
+        // This should throw;
+    }
+
+    function sliceOverflowLength0Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(0, MAX_UINT);
+        // This should throw;
+    }
+
+    function sliceOverflowLength1Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(1, MAX_UINT);
+        // This should throw;
+    }
+
+    function sliceOverflowLength33Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(33, MAX_UINT);
+        // This should throw;
+    }
+
+    function sliceOverflowLengthMinus32Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(1, MAX_UINT - 32);
+        // This should throw;
+    }
+
+    function sliceOverflowStart0Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(MAX_UINT, 0);
+        // This should throw;
+    }
+
+    function sliceOverflowStart1Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(MAX_UINT, 1);
+        // This should throw;
+    }
+
+    function sliceOverflowStart33Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(MAX_UINT, 1);
         // This should throw;
     }
 
