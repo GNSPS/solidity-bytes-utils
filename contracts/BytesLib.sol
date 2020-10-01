@@ -93,7 +93,7 @@ library BytesLib {
             // Read the first 32 bytes of _preBytes storage, which is the length
             // of the array. (We don't need to use the offset into the slot
             // because arrays use the entire slot.)
-            let fslot := sload(_preBytes_slot)
+            let fslot := sload(_preBytes.slot)
             // Arrays of 31 bytes or less have an even value in their slot,
             // while longer arrays have an odd value. The actual length is
             // the slot divided by two for odd values, and the lowest order
@@ -113,7 +113,7 @@ library BytesLib {
                 // update the contents of the slot.
                 // uint256(bytes_storage) = uint256(bytes_storage) + uint256(bytes_memory) + new_length
                 sstore(
-                    _preBytes_slot,
+                    _preBytes.slot,
                     // all the modifications to the slot are inside this
                     // next block
                     add(
@@ -143,11 +143,11 @@ library BytesLib {
                 // The stored value fits in the slot, but the combined value
                 // will exceed it.
                 // get the keccak hash to get the contents of the array
-                mstore(0x0, _preBytes_slot)
+                mstore(0x0, _preBytes.slot)
                 let sc := add(keccak256(0x0, 0x20), div(slength, 32))
 
                 // save new length
-                sstore(_preBytes_slot, add(mul(newlength, 2), 1))
+                sstore(_preBytes.slot, add(mul(newlength, 2), 1))
 
                 // The contents of the _postBytes array start 32 bytes into
                 // the structure. Our first read should obtain the `submod`
@@ -190,12 +190,12 @@ library BytesLib {
             }
             default {
                 // get the keccak hash to get the contents of the array
-                mstore(0x0, _preBytes_slot)
+                mstore(0x0, _preBytes.slot)
                 // Start copying to the last used word of the stored array.
                 let sc := add(keccak256(0x0, 0x20), div(slength, 32))
 
                 // save new length
-                sstore(_preBytes_slot, add(mul(newlength, 2), 1))
+                sstore(_preBytes.slot, add(mul(newlength, 2), 1))
 
                 // Copy over the first `submod` bytes of the new data as in
                 // case 1 above.
