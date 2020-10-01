@@ -22,6 +22,8 @@ This made me realize that in permissioned blockchains where gas is also not a li
 
 ## _Version Notes_:
 
+* Version `v0.2.0` now only compiles with Solidity compilers `0.7.x`.
+
 * Version `v0.9.0` now compiles with Solidity compilers `0.5.x` and `0.6.x`.
 
 * Since version `v0.0.7` the library will only compile on Solidity versions `>0.4.22` so, if you need `v0.4.x` support for your project just use `v0.0.6` of the library with:
