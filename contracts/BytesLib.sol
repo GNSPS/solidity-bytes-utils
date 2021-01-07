@@ -284,6 +284,9 @@ library BytesLib {
             //if we want a zero-length slice let's just return a zero-length array
             default {
                 tempBytes := mload(0x40)
+                //zero out the 32 bytes slice we are about to return
+                //we need to do it because Solidity does not garbage collect
+                mstore(tempBytes, 0)
 
                 mstore(0x40, add(tempBytes, 0x20))
             }

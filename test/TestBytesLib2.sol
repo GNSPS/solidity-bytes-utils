@@ -224,6 +224,35 @@ contract TestBytesLib2 {
         // This should throw;
     }
 
+    /**
+    * Memory Integrity Checks
+    */
+
+    function testMemoryIntegrityCheckZeroLengthSlice() public {
+        // Let's taint memory first
+        bytes memory taintBytes4 = hex"f00dfeed";
+
+        // Now declare arrays to be sliced
+        bytes memory testBytes4 = hex"f00dfeed";
+        bytes memory emptyBytes = hex"";
+
+        bytes memory resultBytes;
+
+        // Try a zero-length slice from a non-zero-length array
+        resultBytes = testBytes4.slice(0,0);
+
+        AssertBytes.equal(hex"", resultBytes, "The result of a zero-length slice is not a zero-length array.");
+
+        // Try a zero-length slice from a zero-length array
+        resultBytes = emptyBytes.slice(0,0);
+
+        AssertBytes.equal(hex"", resultBytes, "The result of a zero-length slice is not a zero-length array.");
+    }
+    
+    /**
+    * Type casting Checks
+    */
+
     function testToUint8() public {
         bytes memory memBytes = hex"f00d20feed";
 
