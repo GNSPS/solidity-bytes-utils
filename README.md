@@ -10,6 +10,18 @@ Given this library has an all-internal collection of methods it doesn't make sen
 
 ## Important Fixes Changelog
 
+_**2021-01-07**_
+
+A bug regarding zero-length slices was disclosed by @MrChico following an audit to the Optimism codebase.
+
+The exact bug happened under the following conditions: if memory slots higher then the current free-memory pointer were tainted before calling the `slice` method with a desired length of `0`, the returned bytes array, instead of being a zero-length slice was an array of arbitrary length based on the values that previously populated that memory region.
+
+Overall, the usage of zero-length slices should be pretty unusual and, as such, hopefully, this bug does not have far-reaching implications. Nonetheless, *please update the library to the new version if you're using it in production*.
+
+**TL;DR: if you're using the `slice` method with a length parameter of '0' in your codebase, please update to version 0.1.2 of the bytes library ASAP!**
+
+_**2020-11-01**_
+
 There was a **critical bug** in the `slice` method, reported on an audit to a DXDao codebase.
 
 Previously, no checks were being made on overflows of the `_start` and `_length` parameters since previous reviews of the codebase deemed this overflow "unexploitable" because of an inordinate expansion of memory (i.e., reading an immensely large memory offset causing huge memory expansion) resulting in an out-of-gas exception.
@@ -21,6 +33,10 @@ This made me realize that in permissioned blockchains where gas is also not a li
 **TL;DR: if you're using the `slice` method with user-supplied inputs in your codebase please update the bytes library immediately!**
 
 ## _Version Notes_:
+
+* Version `v0.1.2` has a major bug fix.
+
+* Version `v0.1.1` has a critical bug fix.
 
 * Version `v0.9.0` now compiles with Solidity compilers `0.5.x` and `0.6.x`.
 
