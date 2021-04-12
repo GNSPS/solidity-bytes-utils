@@ -38,11 +38,11 @@ This made me realize that in permissioned blockchains where gas is also not a li
 This means that now the library will only compile on Solidity versions `>=0.8.0` so, if you need `<0.8.0` support for your project just use `v0.1.2` of the library with:
 
 ```
-$ truffle install bytes@0.0.6
+$ truffle install bytes@0.8.0
 ```
 or
 ```
-$ npm install solidity-bytes-utils@0.0.6
+$ npm install solidity-bytes-utils@0.8.0
 ```
 
 * Version `v0.1.2` has a major bug fix.
