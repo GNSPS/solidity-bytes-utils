@@ -2,13 +2,52 @@
 
 # Solidity Bytes Arrays Utils
 
-Bytes tightly packed arrays utility library for ethereum contracts written in Solidity.
+Bytes tightly packed arrays' utility library for ethereum contracts written in Solidity.
 
 The library lets you concatenate, slice and type cast bytes arrays both in memory and storage.
 
-Given this library has an all-internal collection of methods it doesn't make sense having it reside in the mainnet. Instead it will only be available in EPM as an installable package.
+Given this library has an all-internal collection of methods it doesn't make sense to have it reside in the mainnet. Instead it will only be available on EPM as an installable package.
 
-_Version Notes_:
+## Important Fixes Changelog
+
+_**2021-01-07**_
+
+A bug regarding zero-length slices was disclosed by @MrChico following an audit to the Optimism codebase.
+
+The exact bug happened under the following conditions: if memory slots higher then the current free-memory pointer were tainted before calling the `slice` method with a desired length of `0`, the returned bytes array, instead of being a zero-length slice was an array of arbitrary length based on the values that previously populated that memory region.
+
+Overall, the usage of zero-length slices should be pretty unusual and, as such, hopefully, this bug does not have far-reaching implications. Nonetheless, *please update the library to the new version if you're using it in production*.
+
+**TL;DR: if you're using the `slice` method with a length parameter of '0' in your codebase, please update to version 0.1.2 of the bytes library ASAP!**
+
+_**2020-11-01**_
+
+There was a **critical bug** in the `slice` method, reported on an audit to a DXDao codebase.
+
+Previously, no checks were being made on overflows of the `_start` and `_length` parameters since previous reviews of the codebase deemed this overflow "unexploitable" because of an inordinate expansion of memory (i.e., reading an immensely large memory offset causing huge memory expansion) resulting in an out-of-gas exception.
+
+However, as noted in the review mentioned above, this is not the case. The `slice` method in versions `<=0.9.0` actually allows for arbitrary _kind of_ (i.e., it allows memory writes to very specific values) arbitrary memory writes _in the specific case where these parameters are user-supplied inputs and not hardcoded values (which is uncommon).
+
+This made me realize that in permissioned blockchains where gas is also not a limiting factor this could become problematic in other methods and so I updated all typecasting-related methods to include new bound checks as well.
+
+**TL;DR: if you're using the `slice` method with user-supplied inputs in your codebase please update the bytes library immediately!**
+
+## _Version Notes_:
+
+* Starting from version `v0.8.0` the versioning will change to follow compatible Solidity's compiler versions.
+This means that now the library will only compile on Solidity versions `>=0.8.0` so, if you need `<0.8.0` support for your project just use `v0.1.2` of the library with:
+
+```
+$ truffle install bytes@0.0.6
+```
+or
+```
+$ npm install solidity-bytes-utils@0.0.6
+```
+
+* Version `v0.1.2` has a major bug fix.
+
+* Version `v0.1.1` has a critical bug fix.
 
 * Version `v0.9.0` now compiles with Solidity compilers `0.5.x` and `0.6.x`.
 

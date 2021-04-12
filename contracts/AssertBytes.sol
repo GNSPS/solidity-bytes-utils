@@ -7,7 +7,7 @@
  *      This library is compliant with the test event convention that the Truffle suite uses.
  */
 
-pragma solidity >=0.5.0 <0.7.0;
+pragma solidity >=0.8.0 <0.9.0;
 
 
 library AssertBytes {
@@ -48,7 +48,7 @@ library AssertBytes {
                 for {
                     let cc := add(_b, 0x20)
                 // the next line is the loop condition:
-                // while(uint(mc < end) + cb == 2)
+                // while(uint256(mc < end) + cb == 2)
                 } eq(add(lt(mc, end), cb), 2) {
                     mc := add(mc, 0x20)
                     cc := add(cc, 0x20)
@@ -104,7 +104,7 @@ library AssertBytes {
 
         assembly {
             // we know _a_offset is 0
-            let fslot := sload(_a_slot)
+            let fslot := sload(_a.slot)
             let slength := div(and(fslot, sub(mul(0x100, iszero(and(fslot, 1))), 1)), 2)
             let mlength := mload(_b)
 
@@ -133,14 +133,14 @@ library AssertBytes {
                         let cb := 1
 
                         // get the keccak hash to get the contents of the array
-                        mstore(0x0, _a_slot)
+                        mstore(0x0, _a.slot)
                         let sc := keccak256(0x0, 0x20)
 
                         let mc := add(_b, 0x20)
                         let end := add(mc, mlength)
 
                         // the next line is the loop condition:
-                        // while(uint(mc < end) + cb == 2)
+                        // while(uint256(mc < end) + cb == 2)
                         for {} eq(add(lt(mc, end), cb), 2) {
                             sc := add(sc, 1)
                             mc := add(mc, 0x20)

@@ -6,7 +6,7 @@
  * @dev Bytes tightly packed arrays utility library for ethereum contracts written in Solidity.
  *      The library lets you concatenate, slice and type cast bytes arrays both in memory and storage.
  */
-pragma solidity >=0.5.0 <0.7.0;
+pragma solidity >=0.8.0 <0.9.0;
 
 
 library BytesLib {
@@ -93,7 +93,7 @@ library BytesLib {
             // Read the first 32 bytes of _preBytes storage, which is the length
             // of the array. (We don't need to use the offset into the slot
             // because arrays use the entire slot.)
-            let fslot := sload(_preBytes_slot)
+            let fslot := sload(_preBytes.slot)
             // Arrays of 31 bytes or less have an even value in their slot,
             // while longer arrays have an odd value. The actual length is
             // the slot divided by two for odd values, and the lowest order
@@ -113,7 +113,7 @@ library BytesLib {
                 // update the contents of the slot.
                 // uint256(bytes_storage) = uint256(bytes_storage) + uint256(bytes_memory) + new_length
                 sstore(
-                    _preBytes_slot,
+                    _preBytes.slot,
                     // all the modifications to the slot are inside this
                     // next block
                     add(
@@ -143,11 +143,11 @@ library BytesLib {
                 // The stored value fits in the slot, but the combined value
                 // will exceed it.
                 // get the keccak hash to get the contents of the array
-                mstore(0x0, _preBytes_slot)
+                mstore(0x0, _preBytes.slot)
                 let sc := add(keccak256(0x0, 0x20), div(slength, 32))
 
                 // save new length
-                sstore(_preBytes_slot, add(mul(newlength, 2), 1))
+                sstore(_preBytes.slot, add(mul(newlength, 2), 1))
 
                 // The contents of the _postBytes array start 32 bytes into
                 // the structure. Our first read should obtain the `submod`
@@ -190,12 +190,12 @@ library BytesLib {
             }
             default {
                 // get the keccak hash to get the contents of the array
-                mstore(0x0, _preBytes_slot)
+                mstore(0x0, _preBytes.slot)
                 // Start copying to the last used word of the stored array.
                 let sc := add(keccak256(0x0, 0x20), div(slength, 32))
 
                 // save new length
-                sstore(_preBytes_slot, add(mul(newlength, 2), 1))
+                sstore(_preBytes.slot, add(mul(newlength, 2), 1))
 
                 // Copy over the first `submod` bytes of the new data as in
                 // case 1 above.
@@ -227,14 +227,15 @@ library BytesLib {
 
     function slice(
         bytes memory _bytes,
-        uint _start,
-        uint _length
+        uint256 _start,
+        uint256 _length
     )
         internal
         pure
         returns (bytes memory)
     {
-        require(_bytes.length >= (_start + _length));
+        require(_length + 31 >= _length, "slice_overflow");
+        require(_bytes.length >= _start + _length, "slice_outOfBounds");
 
         bytes memory tempBytes;
 
@@ -282,6 +283,9 @@ library BytesLib {
             //if we want a zero-length slice let's just return a zero-length array
             default {
                 tempBytes := mload(0x40)
+                //zero out the 32 bytes slice we are about to return
+                //we need to do it because Solidity does not garbage collect
+                mstore(tempBytes, 0)
 
                 mstore(0x40, add(tempBytes, 0x20))
             }
@@ -290,8 +294,8 @@ library BytesLib {
         return tempBytes;
     }
 
-    function toAddress(bytes memory _bytes, uint _start) internal  pure returns (address) {
-        require(_bytes.length >= (_start + 20));
+    function toAddress(bytes memory _bytes, uint256 _start) internal pure returns (address) {
+        require(_bytes.length >= _start + 20, "toAddress_outOfBounds");
         address tempAddress;
 
         assembly {
@@ -301,8 +305,8 @@ library BytesLib {
         return tempAddress;
     }
 
-    function toUint8(bytes memory _bytes, uint _start) internal  pure returns (uint8) {
-        require(_bytes.length >= (_start + 1));
+    function toUint8(bytes memory _bytes, uint256 _start) internal pure returns (uint8) {
+        require(_bytes.length >= _start + 1 , "toUint8_outOfBounds");
         uint8 tempUint;
 
         assembly {
@@ -312,8 +316,8 @@ library BytesLib {
         return tempUint;
     }
 
-    function toUint16(bytes memory _bytes, uint _start) internal  pure returns (uint16) {
-        require(_bytes.length >= (_start + 2));
+    function toUint16(bytes memory _bytes, uint256 _start) internal pure returns (uint16) {
+        require(_bytes.length >= _start + 2, "toUint16_outOfBounds");
         uint16 tempUint;
 
         assembly {
@@ -323,8 +327,8 @@ library BytesLib {
         return tempUint;
     }
 
-    function toUint32(bytes memory _bytes, uint _start) internal  pure returns (uint32) {
-        require(_bytes.length >= (_start + 4));
+    function toUint32(bytes memory _bytes, uint256 _start) internal pure returns (uint32) {
+        require(_bytes.length >= _start + 4, "toUint32_outOfBounds");
         uint32 tempUint;
 
         assembly {
@@ -334,8 +338,8 @@ library BytesLib {
         return tempUint;
     }
 
-    function toUint64(bytes memory _bytes, uint _start) internal  pure returns (uint64) {
-        require(_bytes.length >= (_start + 8));
+    function toUint64(bytes memory _bytes, uint256 _start) internal pure returns (uint64) {
+        require(_bytes.length >= _start + 8, "toUint64_outOfBounds");
         uint64 tempUint;
 
         assembly {
@@ -345,8 +349,8 @@ library BytesLib {
         return tempUint;
     }
 
-    function toUint96(bytes memory _bytes, uint _start) internal  pure returns (uint96) {
-        require(_bytes.length >= (_start + 12));
+    function toUint96(bytes memory _bytes, uint256 _start) internal pure returns (uint96) {
+        require(_bytes.length >= _start + 12, "toUint96_outOfBounds");
         uint96 tempUint;
 
         assembly {
@@ -356,8 +360,8 @@ library BytesLib {
         return tempUint;
     }
 
-    function toUint128(bytes memory _bytes, uint _start) internal  pure returns (uint128) {
-        require(_bytes.length >= (_start + 16));
+    function toUint128(bytes memory _bytes, uint256 _start) internal pure returns (uint128) {
+        require(_bytes.length >= _start + 16, "toUint128_outOfBounds");
         uint128 tempUint;
 
         assembly {
@@ -367,8 +371,8 @@ library BytesLib {
         return tempUint;
     }
 
-    function toUint(bytes memory _bytes, uint _start) internal  pure returns (uint256) {
-        require(_bytes.length >= (_start + 32));
+    function toUint256(bytes memory _bytes, uint256 _start) internal pure returns (uint256) {
+        require(_bytes.length >= _start + 32, "toUint256_outOfBounds");
         uint256 tempUint;
 
         assembly {
@@ -378,8 +382,8 @@ library BytesLib {
         return tempUint;
     }
 
-    function toBytes32(bytes memory _bytes, uint _start) internal  pure returns (bytes32) {
-        require(_bytes.length >= (_start + 32));
+    function toBytes32(bytes memory _bytes, uint256 _start) internal pure returns (bytes32) {
+        require(_bytes.length >= _start + 32, "toBytes32_outOfBounds");
         bytes32 tempBytes32;
 
         assembly {
@@ -410,7 +414,7 @@ library BytesLib {
                 for {
                     let cc := add(_postBytes, 0x20)
                 // the next line is the loop condition:
-                // while(uint(mc < end) + cb == 2)
+                // while(uint256(mc < end) + cb == 2)
                 } eq(add(lt(mc, end), cb), 2) {
                     mc := add(mc, 0x20)
                     cc := add(cc, 0x20)
@@ -444,7 +448,7 @@ library BytesLib {
 
         assembly {
             // we know _preBytes_offset is 0
-            let fslot := sload(_preBytes_slot)
+            let fslot := sload(_preBytes.slot)
             // Decode the length of the stored array like in concatStorage().
             let slength := div(and(fslot, sub(mul(0x100, iszero(and(fslot, 1))), 1)), 2)
             let mlength := mload(_postBytes)
@@ -474,14 +478,14 @@ library BytesLib {
                         let cb := 1
 
                         // get the keccak hash to get the contents of the array
-                        mstore(0x0, _preBytes_slot)
+                        mstore(0x0, _preBytes.slot)
                         let sc := keccak256(0x0, 0x20)
 
                         let mc := add(_postBytes, 0x20)
                         let end := add(mc, mlength)
 
                         // the next line is the loop condition:
-                        // while(uint(mc < end) + cb == 2)
+                        // while(uint256(mc < end) + cb == 2)
                         for {} eq(add(lt(mc, end), cb), 2) {
                             sc := add(sc, 1)
                             mc := add(mc, 0x20)

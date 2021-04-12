@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity >=0.5.0 <0.7.0;
+pragma solidity >=0.8.0 <0.9.0;
 
 import "truffle/Assert.sol";
 import "../contracts/AssertBytes.sol";
@@ -11,6 +11,8 @@ contract TestBytesLib2 {
 
     bytes storageCheckBytes = hex"aabbccddeeff";
     bytes storageCheckBytesZeroLength = hex"";
+
+    uint256 constant MAX_UINT = type(uint256).max;
 
     /**
     * Sanity Checks
@@ -98,6 +100,27 @@ contract TestBytesLib2 {
         (r, ) = address(this).call(abi.encodePacked(this.sliceIndexThrow.selector));
         Assert.isFalse(r, "Slicing with wrong index should throw");
 
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowLength0Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in length and _start 0 should throw");
+
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowLength1Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in length and _start 1 should throw");
+
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowLength33Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in length and _start 33 should throw");
+
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowLengthMinus32Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in length minus 32 and _start 1 should throw");
+
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowStart0Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in _start and length 0 should throw");
+
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowStart1Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in _start and length 1 should throw");
+
+        (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowStart33Throw.selector));
+        Assert.isFalse(r, "Slicing with overflow in _start and length 33 should throw");
+
         (r, ) = address(this).call(abi.encodePacked(this.sliceLengthThrow.selector));
         Assert.isFalse(r, "Slicing with wrong length should throw");
     }
@@ -123,6 +146,112 @@ contract TestBytesLib2 {
         resultBytes = memBytes33.slice(0,34);
         // This should throw;
     }
+
+    function sliceOverflowLength0Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(0, MAX_UINT);
+        // This should throw;
+    }
+
+    function sliceOverflowLength1Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(1, MAX_UINT);
+        // This should throw;
+    }
+
+    function sliceOverflowLength33Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(33, MAX_UINT);
+        // This should throw;
+    }
+
+    function sliceOverflowLengthMinus32Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(1, MAX_UINT - 32);
+        // This should throw;
+    }
+
+    function sliceOverflowStart0Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(MAX_UINT, 0);
+        // This should throw;
+    }
+
+    function sliceOverflowStart1Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(MAX_UINT, 1);
+        // This should throw;
+    }
+
+    function sliceOverflowStart33Throw() public pure {
+        bytes memory memBytes33 = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
+
+        bytes memory testBytes;
+        bytes memory resultBytes;
+
+        testBytes = hex"f00d";
+        resultBytes = memBytes33.slice(MAX_UINT, 1);
+        // This should throw;
+    }
+
+    /**
+    * Memory Integrity Checks
+    */
+
+    function testMemoryIntegrityCheckZeroLengthSlice() public {
+        // Let's taint memory first
+        bytes memory taintBytes4 = hex"f00dfeed";
+
+        // Now declare arrays to be sliced
+        bytes memory testBytes4 = hex"f00dfeed";
+        bytes memory emptyBytes = hex"";
+
+        bytes memory resultBytes;
+
+        // Try a zero-length slice from a non-zero-length array
+        resultBytes = testBytes4.slice(0,0);
+
+        AssertBytes.equal(hex"", resultBytes, "The result of a zero-length slice is not a zero-length array.");
+
+        // Try a zero-length slice from a zero-length array
+        resultBytes = emptyBytes.slice(0,0);
+
+        AssertBytes.equal(hex"", resultBytes, "The result of a zero-length slice is not a zero-length array.");
+    }
+    
+    /**
+    * Type casting Checks
+    */
 
     function testToUint8() public {
         bytes memory memBytes = hex"f00d20feed";
@@ -265,7 +394,7 @@ contract TestBytesLib2 {
         uint256 testUint = 32; // 0x20 == 32
         uint256 resultUint;
 
-        resultUint = memBytes.toUint(2);
+        resultUint = memBytes.toUint256(2);
         Assert.equal(resultUint, testUint, "Typecast to 256-bit-wide unsigned integer failed.");
 
         // Testing for the throw conditions below
@@ -278,7 +407,7 @@ contract TestBytesLib2 {
 
         uint256 resultUint;
 
-        resultUint = memBytes.toUint(35);
+        resultUint = memBytes.toUint256(35);
         // This should throw;
     }
 
