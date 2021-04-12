@@ -235,7 +235,6 @@ library BytesLib {
         returns (bytes memory)
     {
         require(_length + 31 >= _length, "slice_overflow");
-        require(_start + _length >= _start, "slice_overflow");
         require(_bytes.length >= _start + _length, "slice_outOfBounds");
 
         bytes memory tempBytes;
@@ -296,7 +295,6 @@ library BytesLib {
     }
 
     function toAddress(bytes memory _bytes, uint256 _start) internal pure returns (address) {
-        require(_start + 20 >= _start, "toAddress_overflow");
         require(_bytes.length >= _start + 20, "toAddress_outOfBounds");
         address tempAddress;
 
