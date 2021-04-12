@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity >=0.5.0 <0.7.0;
+pragma solidity >=0.8.0;
 
 import "truffle/Assert.sol";
-import "../contracts/>=0.8.0/AssertBytes.sol";
-import "../contracts/>=0.8.0/BytesLib.sol";
+import "../contracts/AssertBytes.sol";
+import "../contracts/BytesLib.sol";
 
 
 contract TestBytesLib1 {
