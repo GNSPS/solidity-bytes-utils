@@ -7,7 +7,7 @@
  *      This library is compliant with the test event convention that the Truffle suite uses.
  */
 
-pragma solidity >=0.8.0;
+pragma solidity >=0.8.0 <0.9.0;
 
 
 library AssertBytes {
