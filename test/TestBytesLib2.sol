@@ -12,7 +12,7 @@ contract TestBytesLib2 {
     bytes storageCheckBytes = hex"aabbccddeeff";
     bytes storageCheckBytesZeroLength = hex"";
 
-    uint256 constant MAX_UINT = uint256(-1);
+    uint256 constant MAX_UINT = type(uint256).max;
 
     /**
     * Sanity Checks
