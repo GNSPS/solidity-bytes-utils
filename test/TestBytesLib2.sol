@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity >=0.5.0 <0.7.0;
+pragma solidity >=0.8.0 <0.9.0;
 
 import "truffle/Assert.sol";
 import "../contracts/AssertBytes.sol";
@@ -11,8 +11,8 @@ contract TestBytesLib2 {
 
     bytes storageCheckBytes = hex"aabbccddeeff";
     bytes storageCheckBytesZeroLength = hex"";
-
-    uint256 constant MAX_UINT = uint256(-1);
+    
+    uint256 constant MAX_UINT = type(uint256).max;
 
     /**
     * Sanity Checks

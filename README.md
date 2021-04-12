@@ -2,11 +2,11 @@
 
 # Solidity Bytes Arrays Utils
 
-Bytes tightly packed arrays utility library for ethereum contracts written in Solidity.
+Bytes tightly packed arrays' utility library for ethereum contracts written in Solidity.
 
 The library lets you concatenate, slice and type cast bytes arrays both in memory and storage.
 
-Given this library has an all-internal collection of methods it doesn't make sense having it reside in the mainnet. Instead it will only be available in EPM as an installable package.
+Given this library has an all-internal collection of methods it doesn't make sense to have it reside in the mainnet. Instead it will only be available on EPM as an installable package.
 
 ## Important Fixes Changelog
 
@@ -33,6 +33,17 @@ This made me realize that in permissioned blockchains where gas is also not a li
 **TL;DR: if you're using the `slice` method with user-supplied inputs in your codebase please update the bytes library immediately!**
 
 ## _Version Notes_:
+
+* Starting from version `v0.8.0` the versioning will change to follow compatible Solidity's compiler versions.
+This means that now the library will only compile on Solidity versions `>=0.8.0` so, if you need `<0.8.0` support for your project just use `v0.1.2` of the library with:
+
+```
+$ truffle install bytes@0.0.6
+```
+or
+```
+$ npm install solidity-bytes-utils@0.0.6
+```
 
 * Version `v0.1.2` has a major bug fix.
 
