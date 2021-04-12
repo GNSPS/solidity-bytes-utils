@@ -2,8 +2,8 @@
 pragma solidity >=0.5.0 <0.7.0;
 
 import "truffle/Assert.sol";
-import "../contracts/AssertBytes.sol";
-import "../contracts/BytesLib.sol";
+import "../contracts/>=0.8.0/AssertBytes.sol";
+import "../contracts/>=0.8.0/BytesLib.sol";
 
 
 contract TestBytesLib2 {
