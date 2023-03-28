@@ -299,7 +299,7 @@ library BytesLib {
         address tempAddress;
 
         assembly {
-            tempAddress := div(mload(add(add(_bytes, 0x20), _start)), 0x1000000000000000000000000)
+            tempAddress := mload(add(add(_bytes, 0x14), _start))
         }
 
         return tempAddress;
