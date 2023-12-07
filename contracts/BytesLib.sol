@@ -473,6 +473,8 @@ library BytesLib {
                 // Only if still successful
                 // For <1 word tail bytes
                 if gt(success, 0) {
+                    // Get the remainder of length/32
+                    // length % 32 = AND(length, 32 - 1)
                     let numTailBytes := and(length, 0x1f)
                     let mcRem := mload(mc)
                     let ccRem := mload(cc)
