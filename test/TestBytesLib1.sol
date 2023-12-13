@@ -486,96 +486,196 @@ contract TestBytesLib1 {
     */
 
     function testEqualNonAligned4Bytes() public {
-        bytes memory memBytes1 = hex"f00dfeed";
-        bytes memory memBytes2 = hex"f00dfeed";
+        bytes memory memBytes1; // hex"f00dfeed"
+        bytes memory memBytes2; // hex"f00dfeed"
+
         // We need to make sure that the bytes are not aligned to a 32 byte boundary
         // so we need to use assembly to allocate the bytes in contiguous memory
         // Solidity will not let us do this normally, this equality method exists
         // to test the edge case of non-aligned bytes created in assembly
         assembly {
-            // What we'll do is we'll move the second array's pointer closer to the 
-            // end of the first array, such that the first byte of the second
-            // array is contiguous to the last byte of the first array
-            // first we copy its contents to a temporary variable
-            let temp := mload(memBytes2)
-            // 5 is the length of the first array plus one, for the length byte
-            memBytes2 := add(memBytes1, 5)
-            mstore(memBytes2, temp)
+            // Fetch free memory pointer
+            let freePointer := mload(0x40)
+
+            // We first store the length of the byte array (4 bytes)
+            // And then we write a byte at a time
+            memBytes1 := freePointer
+            mstore(freePointer, 0x04)
+            freePointer := add(freePointer, 0x20)
+            mstore8(freePointer, 0xf0)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0x0d)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0xfe)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0xed)
+            freePointer := add(freePointer, 0x1)
+
+            // We do the same for memBytes2 in contiguous memory
+            memBytes2 := freePointer
+            mstore(freePointer, 0x04)
+            freePointer := add(freePointer, 0x20)
+            mstore8(freePointer, 0xf0)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0x0d)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0xfe)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0xed)
+            freePointer := add(freePointer, 0x1)
+
+            // We add some garbage bytes in contiguous memory
+            mstore8(freePointer, 0xde)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0xad)
+            freePointer := add(freePointer, 0x1)
+
             // now, just for completeness sake we'll update the free-memory pointer accordingly
-            mstore(0x40, add(memBytes2, 5))
+            mstore(0x40, freePointer)
         }
 
         AssertBytes.equal_nonAligned(memBytes1, memBytes2, "The equality check for the non-aligned equality 4-bytes-long test failed.");
+        // The equality check for aligned byte arrays should fail for non-aligned bytes
+        AssertBytes.notEqual(memBytes1, memBytes2, "The equality check for the non-aligned equality 4-bytes-long test failed.");
     }
 
     function testEqualNonAligned4BytesFail() public {
-        bytes memory memBytes1 = hex"f00dfeed";
-        bytes memory memBytes2 = hex"feedf00d";
+        bytes memory memBytes1; // hex"f00dfeed"
+        bytes memory memBytes2; // hex"feedf00d"
+
         // We need to make sure that the bytes are not aligned to a 32 byte boundary
         // so we need to use assembly to allocate the bytes in contiguous memory
         // Solidity will not let us do this normally, this equality method exists
         // to test the edge case of non-aligned bytes created in assembly
         assembly {
-            // What we'll do is we'll move the second array's pointer closer to the 
-            // end of the first array, such that the first byte of the second
-            // array is contiguous to the last byte of the first array
-            // first we copy its contents to a temporary variable
-            let temp := mload(memBytes2)
-            // 5 is the length of the first array plus one, for the length byte
-            memBytes2 := add(memBytes1, 5)
-            mstore(memBytes2, temp)
+            // Fetch free memory pointer
+            let freePointer := mload(0x40)
+
+            // We first store the length of the byte array (4 bytes)
+            // And then we write a byte at a time
+            memBytes1 := freePointer
+            mstore(freePointer, 0x04)
+            freePointer := add(freePointer, 0x20)
+            mstore8(freePointer, 0xf0)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0x0d)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0xfe)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0xed)
+            freePointer := add(freePointer, 0x1)
+
+            // We do the same for memBytes2 in contiguous memory
+            memBytes2 := freePointer
+            mstore(freePointer, 0x04)
+            freePointer := add(freePointer, 0x20)
+            mstore8(freePointer, 0xfe)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0xed)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0xf0)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0x0d)
+            freePointer := add(freePointer, 0x1)
+
+            // We add some garbage bytes in contiguous memory
+            mstore8(freePointer, 0xde)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0xad)
+            freePointer := add(freePointer, 0x1)
+
             // now, just for completeness sake we'll update the free-memory pointer accordingly
-            mstore(0x40, add(memBytes2, 5))
+            mstore(0x40, freePointer)
         }
 
         AssertBytes.notEqual_nonAligned(memBytes1, memBytes2, "The non equality check for the non-aligned equality 4-bytes-long test failed.");
     }
 
     function testEqualNonAligned33Bytes() public {
-        bytes memory memBytes1 = hex"f00d00000000000000000000000000000000000000000000000000000000feedcc";
-        bytes memory memBytes2 = hex"f00d00000000000000000000000000000000000000000000000000000000feedcc";
+        bytes memory memBytes1; // hex"f00d00000000000000000000000000000000000000000000000000000000feedcc";
+        bytes memory memBytes2; // hex"f00d00000000000000000000000000000000000000000000000000000000feedcc";
+        
         // We need to make sure that the bytes are not aligned to a 32 byte boundary
         // so we need to use assembly to allocate the bytes in contiguous memory
         // Solidity will not let us do this normally, this equality method exists
         // to test the edge case of non-aligned bytes created in assembly
         assembly {
-            // What we'll do is we'll move the second array's pointer closer to the 
-            // end of the first array, such that the first byte of the second
-            // array is contiguous to the last byte of the first array
-            // first we copy its contents to a temporary variable
-            let temp1 := mload(memBytes2)
-            let temp2 := mload(add(memBytes2, 0x20))
-            // 34 (0x22) is the length of the first array plus one, for the length byte
-            memBytes2 := add(memBytes1, 0x22)
-            mstore(memBytes2, temp1)
-            mstore(add(memBytes2, 0x20), temp2)
+            // Fetch free memory pointer
+            let freePointer := mload(0x40)
+
+            // We first store the length of the byte array (33 bytes)
+            // And then we write a word and then a byte
+            memBytes1 := freePointer
+            mstore(freePointer, 0x21)
+            freePointer := add(freePointer, 0x20)
+            mstore(freePointer, 0xf00d00000000000000000000000000000000000000000000000000000000feed)
+            freePointer := add(freePointer, 0x20)
+            mstore8(freePointer, 0xcc)
+            freePointer := add(freePointer, 0x1)
+
+            // We do the same for memBytes2 in contiguous memory
+            memBytes2 := freePointer
+            mstore(freePointer, 0x21)
+            freePointer := add(freePointer, 0x20)
+            mstore(freePointer, 0xf00d00000000000000000000000000000000000000000000000000000000feed)
+            freePointer := add(freePointer, 0x20)
+            mstore8(freePointer, 0xcc)
+            freePointer := add(freePointer, 0x1)
+
+            // We add some garbage bytes in contiguous memory
+            mstore8(freePointer, 0xde)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0xad)
+            freePointer := add(freePointer, 0x1)
+
             // now, just for completeness sake we'll update the free-memory pointer accordingly
-            mstore(0x40, add(memBytes2, 0x22))
+            mstore(0x40, freePointer)
         }
 
         AssertBytes.equal_nonAligned(memBytes1, memBytes2, "The equality check for the non-aligned equality 33-bytes-long test failed.");
+        // The equality check for aligned byte arrays should fail for non-aligned bytes
+        AssertBytes.notEqual(memBytes1, memBytes2, "The equality check for the non-aligned equality 4-bytes-long test failed.");
     }
 
     function testEqualNonAligned33BytesFail() public {
-        bytes memory memBytes1 = hex"f00d00000000000000000000000000000000000000000000000000000000feedcc";
-        bytes memory memBytes2 = hex"f00d00000000000000000000000000000000000000000000000000000000feedee";
+        bytes memory memBytes1; // hex"f00d00000000000000000000000000000000000000000000000000000000feedcc";
+        bytes memory memBytes2; // hex"f00d00000000000000000000000000000000000000000000000000000000feedee";
+        
         // We need to make sure that the bytes are not aligned to a 32 byte boundary
         // so we need to use assembly to allocate the bytes in contiguous memory
         // Solidity will not let us do this normally, this equality method exists
         // to test the edge case of non-aligned bytes created in assembly
         assembly {
-            // What we'll do is we'll move the second array's pointer closer to the 
-            // end of the first array, such that the first byte of the second
-            // array is contiguous to the last byte of the first array
-            // first we copy its contents to a temporary variable
-            let temp1 := mload(memBytes2)
-            let temp2 := mload(add(memBytes2, 0x20))
-            // 34 (0x22) is the length of the first array plus one, for the length byte
-            memBytes2 := add(memBytes1, 0x22)
-            mstore(memBytes2, temp1)
-            mstore(add(memBytes2, 0x20), temp2)
+            // Fetch free memory pointer
+            let freePointer := mload(0x40)
+
+            // We first store the length of the byte array (33 bytes)
+            // And then we write a word and then a byte
+            memBytes1 := freePointer
+            mstore(freePointer, 0x21)
+            freePointer := add(freePointer, 0x20)
+            mstore(freePointer, 0xf00d00000000000000000000000000000000000000000000000000000000feed)
+            freePointer := add(freePointer, 0x20)
+            mstore8(freePointer, 0xcc)
+            freePointer := add(freePointer, 0x1)
+
+            // We do the same for memBytes2 in contiguous memory
+            memBytes2 := freePointer
+            mstore(freePointer, 0x21)
+            freePointer := add(freePointer, 0x20)
+            mstore(freePointer, 0xf00d00000000000000000000000000000000000000000000000000000000feed)
+            freePointer := add(freePointer, 0x20)
+            mstore8(freePointer, 0xee)
+            freePointer := add(freePointer, 0x1)
+
+            // We add some garbage bytes in contiguous memory
+            mstore8(freePointer, 0xde)
+            freePointer := add(freePointer, 0x1)
+            mstore8(freePointer, 0xad)
+            freePointer := add(freePointer, 0x1)
+
             // now, just for completeness sake we'll update the free-memory pointer accordingly
-            mstore(0x40, add(memBytes2, 0x22))
+            mstore(0x40, freePointer)
         }
 
         AssertBytes.notEqual_nonAligned(memBytes1, memBytes2, "The non equality check for the non-aligned equality 33-bytes-long test failed.");
