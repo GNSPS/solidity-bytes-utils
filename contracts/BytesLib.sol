@@ -436,6 +436,72 @@ library BytesLib {
         return success;
     }
 
+    function equal_nonAligned(bytes memory _preBytes, bytes memory _postBytes) internal pure returns (bool) {
+        bool success = true;
+
+        assembly {
+            let length := mload(_preBytes)
+
+            // if lengths don't match the arrays are not equal
+            switch eq(length, mload(_postBytes))
+            case 1 {
+                // cb is a circuit breaker in the for loop since there's
+                //  no said feature for inline assembly loops
+                // cb = 1 - don't breaker
+                // cb = 0 - break
+                let cb := 1
+
+                let endMinusWord := add(_preBytes, length)
+                let mc := add(_preBytes, 0x20)
+                let cc := add(_postBytes, 0x20)
+
+                for {
+                // the next line is the loop condition:
+                // while(uint256(mc < endWord) + cb == 2)
+                } eq(add(lt(mc, endMinusWord), cb), 2) {
+                    mc := add(mc, 0x20)
+                    cc := add(cc, 0x20)
+                } {
+                    // if any of these checks fails then arrays are not equal
+                    if iszero(eq(mload(mc), mload(cc))) {
+                        // unsuccess:
+                        success := 0
+                        cb := 0
+                    }
+                }
+
+                // Only if still successful
+                // For <1 word tail bytes
+                if gt(success, 0) {
+                    // Get the remainder of length/32
+                    // length % 32 = AND(length, 32 - 1)
+                    let numTailBytes := and(length, 0x1f)
+                    let mcRem := mload(mc)
+                    let ccRem := mload(cc)
+                    for {
+                        let i := 0
+                    // the next line is the loop condition:
+                    // while(uint256(i < numTailBytes) + cb == 2)
+                    } eq(add(lt(i, numTailBytes), cb), 2) {
+                        i := add(i, 1)
+                    } {
+                        if iszero(eq(byte(i, mcRem), byte(i, ccRem))) {
+                            // unsuccess:
+                            success := 0
+                            cb := 0
+                        }
+                    }
+                }
+            }
+            default {
+                // unsuccess:
+                success := 0
+            }
+        }
+
+        return success;
+    }
+
     function equalStorage(
         bytes storage _preBytes,
         bytes memory _postBytes
