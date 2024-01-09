@@ -34,15 +34,25 @@ contract TestBytesLib2 is Test {
         assertEq(checkBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out.");
         assertTrue(keccak256(checkBytes) != keccak256(checkBytesWrongLength), "Sanity check should be checking different length bytes arrays out.");
         assertTrue(keccak256(checkBytes) != keccak256(checkBytesWrongContent), "Sanity check should be checking different content bytes arrays out.");
+        AssertBytes.equal(checkBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out.");
+        AssertBytes.notEqual(checkBytes, checkBytesWrongLength, "Sanity check should be checking different length bytes arrays out.");
+        AssertBytes.notEqual(checkBytes, checkBytesWrongContent, "Sanity check should be checking different content bytes arrays out.");
 
         assertEq(storageCheckBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out. (Storage)");
         assertTrue(keccak256(storageCheckBytes) != keccak256(checkBytesWrongLength), "Sanity check should be checking different length bytes arrays out. (Storage)");
         assertTrue(keccak256(storageCheckBytes) != keccak256(checkBytesWrongContent), "Sanity check should be checking different content bytes arrays out. (Storage)");
+AssertBytes.equalStorage(storageCheckBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out. (Storage)");
+        AssertBytes.notEqualStorage(storageCheckBytes, checkBytesWrongLength, "Sanity check should be checking different length bytes arrays out. (Storage)");
+        AssertBytes.notEqualStorage(storageCheckBytes, checkBytesWrongContent, "Sanity check should be checking different content bytes arrays out. (Storage)");
 
         // Zero-length checks
         assertEq(checkBytesZeroLength, checkBytesZeroLengthRight, "Sanity check should be checking equal zero-length bytes arrays out.");
         assertTrue(keccak256(checkBytesZeroLength) != keccak256(checkBytes), "Sanity check should be checking different length bytes arrays out.");
+AssertBytes.equal(checkBytesZeroLength, checkBytesZeroLengthRight, "Sanity check should be checking equal zero-length bytes arrays out.");
+        AssertBytes.notEqual(checkBytesZeroLength, checkBytes, "Sanity check should be checking different length bytes arrays out.");
 
+        AssertBytes.equalStorage(storageCheckBytesZeroLength, checkBytesZeroLengthRight, "Sanity check should be checking equal zero-length bytes arrays out. (Storage)");
+        AssertBytes.notEqualStorage(storageCheckBytesZeroLength, checkBytes, "Sanity check should be checking different length bytes arrays out. (Storage)");
     }
 
     /**
@@ -58,30 +68,37 @@ contract TestBytesLib2 is Test {
         testBytes = hex"f00d";
         resultBytes = memBytes.slice(0,2);
         assertEq(resultBytes, testBytes);
+        AssertBytes.equal(resultBytes, testBytes, "Normal slicing array failed.");
 
         testBytes = hex"";
         resultBytes = memBytes.slice(1,0);
         assertEq(resultBytes, testBytes);
+        AssertBytes.equal(resultBytes, testBytes, "Slicing with zero-length failed.");
 
         testBytes = hex"";
         resultBytes = memBytes.slice(0,0);
         assertEq(resultBytes, testBytes);
+        AssertBytes.equal(resultBytes, testBytes, "Slicing with zero-length on index 0 failed.");
 
         testBytes = hex"feed";
         resultBytes = memBytes.slice(31,2);
         assertEq(resultBytes, testBytes);
+        AssertBytes.equal(resultBytes, testBytes, "Slicing across the 32-byte slot boundary failed.");
 
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
         resultBytes = memBytes.slice(0,33);
         assertEq(resultBytes, testBytes);
+        AssertBytes.equal(resultBytes, testBytes, "Full length slice failed.");
 
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000fe";
         resultBytes = memBytes.slice(0,32);
         assertEq(resultBytes, testBytes);
+        AssertBytes.equal(resultBytes, testBytes, "Multiple of 32 bytes slice failed.");
 
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000fe";
         resultBytes = memBytes.slice(0,64);
         assertEq(resultBytes, testBytes);
+        AssertBytes.equal(resultBytes, testBytes, "Multiple (*2) of 32 bytes slice failed.");
 
         // With v0.5.x we can now entirely replace the ThrowProxy patterns that was creating issues with the js-vm
         // and use an external call to our own contract with the function selector, since Solidity now gives us
@@ -236,11 +253,13 @@ contract TestBytesLib2 is Test {
         resultBytes = testBytes4.slice(0,0);
 
         assertEq(hex"", resultBytes);
+        AssertBytes.equal(hex"", resultBytes, "The result of a zero-length slice is not a zero-length array.");
 
         // Try a zero-length slice from a zero-length array
         resultBytes = emptyBytes.slice(0,0);
 
         assertEq(hex"", resultBytes);
+        AssertBytes.equal(hex"", resultBytes, "The result of a zero-length slice is not a zero-length array.");
     }
     
     /**
