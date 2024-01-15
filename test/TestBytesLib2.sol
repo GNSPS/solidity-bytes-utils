@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity >=0.8.0 <0.9.0;
 
-import "truffle/Assert.sol";
+import "forge-std/Test.sol";
 import "../contracts/AssertBytes.sol";
 import "../contracts/BytesLib.sol";
 
 
-contract TestBytesLib2 {
+contract TestBytesLib2 is Test {
     using BytesLib for bytes;
 
     bytes storageCheckBytes = hex"aabbccddeeff";
@@ -31,20 +31,24 @@ contract TestBytesLib2 {
         bytes memory checkBytesWrongLength = hex"aa0000";
         bytes memory checkBytesWrongContent = hex"aabbccddee00";
 
-        // This next line is needed in order for Truffle to activate the Solidity unit testing feature
-        // otherwise it doesn't interpret any events fired as results of tests
-        Assert.equal(uint256(1), uint256(1), "This should not fail! :D");
-
+        assertEq(checkBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out.");
+        assertTrue(keccak256(checkBytes) != keccak256(checkBytesWrongLength), "Sanity check should be checking different length bytes arrays out.");
+        assertTrue(keccak256(checkBytes) != keccak256(checkBytesWrongContent), "Sanity check should be checking different content bytes arrays out.");
         AssertBytes.equal(checkBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out.");
         AssertBytes.notEqual(checkBytes, checkBytesWrongLength, "Sanity check should be checking different length bytes arrays out.");
         AssertBytes.notEqual(checkBytes, checkBytesWrongContent, "Sanity check should be checking different content bytes arrays out.");
 
-        AssertBytes.equalStorage(storageCheckBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out. (Storage)");
+        assertEq(storageCheckBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out. (Storage)");
+        assertTrue(keccak256(storageCheckBytes) != keccak256(checkBytesWrongLength), "Sanity check should be checking different length bytes arrays out. (Storage)");
+        assertTrue(keccak256(storageCheckBytes) != keccak256(checkBytesWrongContent), "Sanity check should be checking different content bytes arrays out. (Storage)");
+AssertBytes.equalStorage(storageCheckBytes, checkBytesRight, "Sanity check should be checking equal bytes arrays out. (Storage)");
         AssertBytes.notEqualStorage(storageCheckBytes, checkBytesWrongLength, "Sanity check should be checking different length bytes arrays out. (Storage)");
         AssertBytes.notEqualStorage(storageCheckBytes, checkBytesWrongContent, "Sanity check should be checking different content bytes arrays out. (Storage)");
 
         // Zero-length checks
-        AssertBytes.equal(checkBytesZeroLength, checkBytesZeroLengthRight, "Sanity check should be checking equal zero-length bytes arrays out.");
+        assertEq(checkBytesZeroLength, checkBytesZeroLengthRight, "Sanity check should be checking equal zero-length bytes arrays out.");
+        assertTrue(keccak256(checkBytesZeroLength) != keccak256(checkBytes), "Sanity check should be checking different length bytes arrays out.");
+AssertBytes.equal(checkBytesZeroLength, checkBytesZeroLengthRight, "Sanity check should be checking equal zero-length bytes arrays out.");
         AssertBytes.notEqual(checkBytesZeroLength, checkBytes, "Sanity check should be checking different length bytes arrays out.");
 
         AssertBytes.equalStorage(storageCheckBytesZeroLength, checkBytesZeroLengthRight, "Sanity check should be checking equal zero-length bytes arrays out. (Storage)");
@@ -63,30 +67,37 @@ contract TestBytesLib2 {
 
         testBytes = hex"f00d";
         resultBytes = memBytes.slice(0,2);
+        assertEq(resultBytes, testBytes);
         AssertBytes.equal(resultBytes, testBytes, "Normal slicing array failed.");
 
         testBytes = hex"";
         resultBytes = memBytes.slice(1,0);
+        assertEq(resultBytes, testBytes);
         AssertBytes.equal(resultBytes, testBytes, "Slicing with zero-length failed.");
 
         testBytes = hex"";
         resultBytes = memBytes.slice(0,0);
+        assertEq(resultBytes, testBytes);
         AssertBytes.equal(resultBytes, testBytes, "Slicing with zero-length on index 0 failed.");
 
         testBytes = hex"feed";
         resultBytes = memBytes.slice(31,2);
+        assertEq(resultBytes, testBytes);
         AssertBytes.equal(resultBytes, testBytes, "Slicing across the 32-byte slot boundary failed.");
 
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feed";
         resultBytes = memBytes.slice(0,33);
+        assertEq(resultBytes, testBytes);
         AssertBytes.equal(resultBytes, testBytes, "Full length slice failed.");
 
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000fe";
         resultBytes = memBytes.slice(0,32);
+        assertEq(resultBytes, testBytes);
         AssertBytes.equal(resultBytes, testBytes, "Multiple of 32 bytes slice failed.");
 
         testBytes = hex"f00d0000000000000000000000000000000000000000000000000000000000feedf00d00000000000000000000000000000000000000000000000000000000fe";
         resultBytes = memBytes.slice(0,64);
+        assertEq(resultBytes, testBytes);
         AssertBytes.equal(resultBytes, testBytes, "Multiple (*2) of 32 bytes slice failed.");
 
         // With v0.5.x we can now entirely replace the ThrowProxy patterns that was creating issues with the js-vm
@@ -98,31 +109,31 @@ contract TestBytesLib2 {
         // msg.data equal to the throwing function selector that we want to be sure throws and using only the boolean
         // value associated with the message call's success
         (r, ) = address(this).call(abi.encodePacked(this.sliceIndexThrow.selector));
-        Assert.isFalse(r, "Slicing with wrong index should throw");
+        assertFalse(r);
 
         (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowLength0Throw.selector));
-        Assert.isFalse(r, "Slicing with overflow in length and _start 0 should throw");
+        assertFalse(r);
 
         (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowLength1Throw.selector));
-        Assert.isFalse(r, "Slicing with overflow in length and _start 1 should throw");
+        assertFalse(r);
 
         (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowLength33Throw.selector));
-        Assert.isFalse(r, "Slicing with overflow in length and _start 33 should throw");
+        assertFalse(r);
 
         (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowLengthMinus32Throw.selector));
-        Assert.isFalse(r, "Slicing with overflow in length minus 32 and _start 1 should throw");
+        assertFalse(r);
 
         (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowStart0Throw.selector));
-        Assert.isFalse(r, "Slicing with overflow in _start and length 0 should throw");
+        assertFalse(r);
 
         (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowStart1Throw.selector));
-        Assert.isFalse(r, "Slicing with overflow in _start and length 1 should throw");
+        assertFalse(r);
 
         (r, ) = address(this).call(abi.encodePacked(this.sliceOverflowStart33Throw.selector));
-        Assert.isFalse(r, "Slicing with overflow in _start and length 33 should throw");
+        assertFalse(r);
 
         (r, ) = address(this).call(abi.encodePacked(this.sliceLengthThrow.selector));
-        Assert.isFalse(r, "Slicing with wrong length should throw");
+        assertFalse(r);
     }
 
     function sliceIndexThrow() public pure {
@@ -241,11 +252,13 @@ contract TestBytesLib2 {
         // Try a zero-length slice from a non-zero-length array
         resultBytes = testBytes4.slice(0,0);
 
+        assertEq(hex"", resultBytes);
         AssertBytes.equal(hex"", resultBytes, "The result of a zero-length slice is not a zero-length array.");
 
         // Try a zero-length slice from a zero-length array
         resultBytes = emptyBytes.slice(0,0);
 
+        assertEq(hex"", resultBytes);
         AssertBytes.equal(hex"", resultBytes, "The result of a zero-length slice is not a zero-length array.");
     }
     
@@ -260,11 +273,11 @@ contract TestBytesLib2 {
         uint8 resultUint8;
 
         resultUint8 = memBytes.toUint8(2);
-        Assert.equal(uint256(resultUint8), uint256(testUint8), "Typecast to 8-bit-wide unsigned integer failed.");
+        assertEq(uint256(resultUint8), uint256(testUint8));
 
         // Testing for the throw conditions below
         (bool r, ) = address(this).call(abi.encodePacked(this.toUint8Throw.selector));
-        Assert.isFalse(r, "Typecasting with wrong index should throw");
+        assertFalse(r);
     }
 
     function toUint8Throw() public pure {
@@ -283,11 +296,11 @@ contract TestBytesLib2 {
         uint16 resultUint16;
 
         resultUint16 = memBytes.toUint16(2);
-        Assert.equal(uint256(resultUint16), uint256(testUint16), "Typecast to 16-bit-wide unsigned integer failed.");
+        assertEq(uint256(resultUint16), uint256(testUint16));
 
         // Testing for the throw conditions below
         (bool r, ) = address(this).call(abi.encodePacked(this.toUint16Throw.selector));
-        Assert.isFalse(r, "Typecasting with wrong index should throw");
+        assertFalse(r);
     }
 
     function toUint16Throw() public pure {
@@ -306,11 +319,11 @@ contract TestBytesLib2 {
         uint32 resultUint32;
 
         resultUint32 = memBytes.toUint32(2);
-        Assert.equal(uint256(resultUint32), uint256(testUint32), "Typecast to 32-bit-wide unsigned integer failed.");
+        assertEq(uint256(resultUint32), uint256(testUint32));
 
         // Testing for the throw conditions below
         (bool r, ) = address(this).call(abi.encodePacked(this.toUint32Throw.selector));
-        Assert.isFalse(r, "Typecasting with wrong index should throw");
+        assertFalse(r);
     }
 
     function toUint32Throw() public pure {
@@ -329,11 +342,11 @@ contract TestBytesLib2 {
         uint64 resultUint64;
 
         resultUint64 = memBytes.toUint64(2);
-        Assert.equal(uint256(resultUint64), uint256(testUint64), "Typecast to 64-bit-wide unsigned integer failed.");
+        assertEq(uint256(resultUint64), uint256(testUint64));
 
         // Testing for the throw conditions below
         (bool r, ) = address(this).call(abi.encodePacked(this.toUint64Throw.selector));
-        Assert.isFalse(r, "Typecasting with wrong index should throw");
+        assertFalse(r);
     }
 
     function toUint64Throw() public pure {
@@ -351,11 +364,11 @@ contract TestBytesLib2 {
         uint96 resultUint96;
 
         resultUint96 = memBytes.toUint96(2);
-        Assert.equal(uint256(resultUint96), uint256(testUint96), "Typecast to 96-bit-wide unsigned integer failed.");
+        assertEq(uint256(resultUint96), uint256(testUint96));
 
         // Testing for the throw conditions below
         (bool r, ) = address(this).call(abi.encodePacked(this.toUint64Throw.selector));
-        Assert.isFalse(r, "Typecasting with wrong index should throw");
+        assertFalse(r);
     }
 
     function toUint96Throw() public pure {
@@ -373,11 +386,11 @@ contract TestBytesLib2 {
         uint128 resultUint128;
 
         resultUint128 = memBytes.toUint128(2);
-        Assert.equal(uint256(resultUint128), uint256(testUint128), "Typecast to 128-bit-wide unsigned integer failed.");
+        assertEq(uint256(resultUint128), uint256(testUint128));
 
         // Testing for the throw conditions below
         (bool r, ) = address(this).call(abi.encodePacked(this.toUint128Throw.selector));
-        Assert.isFalse(r, "Typecasting with wrong index should throw");
+        assertFalse(r);
     }
 
     function toUint128Throw() public pure {
@@ -395,11 +408,11 @@ contract TestBytesLib2 {
         uint256 resultUint;
 
         resultUint = memBytes.toUint256(2);
-        Assert.equal(resultUint, testUint, "Typecast to 256-bit-wide unsigned integer failed.");
+        assertEq(resultUint, testUint);
 
         // Testing for the throw conditions below
         (bool r, ) = address(this).call(abi.encodePacked(this.toUintThrow.selector));
-        Assert.isFalse(r, "Typecasting with wrong index should throw");
+        assertFalse(r);
     }
 
     function toUintThrow() public pure {
@@ -418,11 +431,11 @@ contract TestBytesLib2 {
         address resultAddress;
 
         resultAddress = memBytes.toAddress(4);
-        Assert.equal(resultAddress, testAddress, "Typecast to address failed.");
+        assertEq(resultAddress, testAddress);
 
         // Testing for the throw conditions below
         (bool r, ) = address(this).call(abi.encodePacked(this.toAddressThrow.selector));
-        Assert.isFalse(r, "Typecasting with wrong index should throw");
+        assertFalse(r);
     }
 
     function toAddressThrow() public pure {

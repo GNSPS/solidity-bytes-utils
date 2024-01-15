@@ -26,9 +26,7 @@
   },
   "homepage": "https://github.com/GNSPS/solidity-bytes-utils#readme",
   "dependencies": {
-    "@truffle/hdwallet-provider": "latest"
-  },
-  "devDependencies": {
-    "truffle": "latest"
+    "ds-test": "github:dapphub/ds-test",
+    "forge-std": "^1.1.2"
   }
 }
