@@ -34,5 +34,8 @@ jobs:
           node-version-file: ".nvmrc"
           cache: "npm"
 
+      - name: Setup Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
       - name: Test
         run: npm run test
