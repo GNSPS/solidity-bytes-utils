@@ -26,7 +26,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           # We want to include the forge-std submodule
-          submodules: "true"
+          # along with its submodules (i.e. ds-test)
+          submodules: recursive
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
