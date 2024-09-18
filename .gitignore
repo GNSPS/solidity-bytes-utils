@@ -14,3 +14,5 @@ build/*
 node_modules/*
 
 
+/cache
+/out
