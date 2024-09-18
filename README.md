@@ -1,5 +1,3 @@
-![Codeship Status for GNSPS/solidity-bytes-utils](https://app.codeship.com/projects/45b97080-bc0c-0135-fb75-76c2fb8e249b/status?branch=master)
-
 # Solidity Bytes Arrays Utils
 
 Bytes tightly packed arrays' utility library for ethereum contracts written in Solidity.
@@ -33,6 +31,9 @@ This made me realize that in permissioned blockchains where gas is also not a li
 **TL;DR: if you're using the `slice` method with user-supplied inputs in your codebase please update the bytes library immediately!**
 
 ## _Version Notes_:
+
+* Version `v0.9.0` has a new feature: a new "equal_nonAligned" method that allows for comparing two bytes arrays that are not aligned to 32 bytes.
+This is useful for comparing bytes arrays that were created with assembly/Yul or other, non-Solidity compilers that don't pad bytes arrays to 32 bytes.
 
 * Starting from version `v0.8.0` the versioning will change to follow compatible Solidity's compiler versions.
 This means that now the library will only compile on Solidity versions `>=0.8.0` so, if you need `<0.8.0` support for your project just use `v0.1.2` of the library with:
