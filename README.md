@@ -12,7 +12,7 @@ _**2021-01-07**_
 
 A bug regarding zero-length slices was disclosed by @MrChico following an audit to the Optimism codebase.
 
-The exact bug happened under the following conditions: if memory slots higher then the current free-memory pointer were tainted before calling the `slice` method with a desired length of `0`, the returned bytes array, instead of being a zero-length slice was an array of arbitrary length based on the values that previously populated that memory region.
+The exact bug happened under the following conditions: if memory slots higher than the current free-memory pointer were tainted before calling the `slice` method with a desired length of `0`, the returned bytes array, instead of being a zero-length slice was an array of arbitrary length based on the values that previously populated that memory region.
 
 Overall, the usage of zero-length slices should be pretty unusual and, as such, hopefully, this bug does not have far-reaching implications. Nonetheless, *please update the library to the new version if you're using it in production*.
 
