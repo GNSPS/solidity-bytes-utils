@@ -100,7 +100,7 @@ AssertBytes.equal(checkBytesZeroLength, checkBytesZeroLengthRight, "Sanity check
         assertEq(resultBytes, testBytes);
         AssertBytes.equal(resultBytes, testBytes, "Multiple (*2) of 32 bytes slice failed.");
 
-        // With v0.5.x we can now entirely replace the ThrowProxy patterns that was creating issues with the js-vm
+        // With v0.5.x we can now entirely replace the ThrowProxy patterns that were creating issues with the js-vm
         // and use an external call to our own contract with the function selector, since Solidity now gives us
         // access to those
         bool r;
