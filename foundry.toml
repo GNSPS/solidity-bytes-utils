@@ -1,0 +1,6 @@
+[profile.default]
+solc-version = '0.8.22'
+src = 'contracts'
+test = 'test'
+cache_path = 'cache'
+libs = ['lib']
