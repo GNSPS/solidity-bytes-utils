@@ -234,7 +234,11 @@ library BytesLib {
         pure
         returns (bytes memory)
     {
-        require(_length + 31 >= _length, "slice_overflow");
+        // We're using the unchecked block below because otherwise execution ends 
+        // with the native overflow error code.
+        unchecked {
+            require(_length + 31 >= _length, "slice_overflow");
+        }
         require(_bytes.length >= _start + _length, "slice_outOfBounds");
 
         bytes memory tempBytes;
